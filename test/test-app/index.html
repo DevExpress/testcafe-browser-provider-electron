@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title>TEST</title>
+    </head>
+    <body>
+        <h1>TEST ME</h1>
+        <script>
+            var foo = require('./client.js').foo;
+
+            document.querySelector('h1').textContent = foo();
+        </script>
+    </body>
+</html>
