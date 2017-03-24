@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { testPage } from '../config';
 
 
@@ -14,6 +13,7 @@ test('Resize test', async t => {
         height: window.innerHeight
     }));
 
-    expect(newSize.width).to.be.equal(800);
-    expect(newSize.height).to.be.equal(600);
+    await t
+        .expect(newSize.width).eql(800)
+        .expect(newSize.height).eql(600);
 });

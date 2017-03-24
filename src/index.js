@@ -6,36 +6,95 @@ import OS from 'os-family';
 import promisify from 'pify';
 import isAbsolute from './utils/is-absolute';
 import ELECTRON_PATH from 'electron';
+import MESSAGES from './messages';
+import CONSTANTS from './constants';
+
+import { ClientFunction } from 'testcafe';
 
 
 const exec = promisify(nodeExec, Promise);
 
+/* eslint-disable no-undef */
+const getMainMenu = ClientFunction(() => {
+    return require('electron').remote.Menu.getApplicationMenu();
+});
 
-function startElectron (electronPath, appPath, env) {
+const getContextMenu = ClientFunction(() => {
+    return require('electron').remote.getGlobal(contextMenuGlobal);
+}, { dependencies: CONSTANTS });
+
+const doMenuClick = ClientFunction((menuSnapshot, modifiers) => {
+    var remote = require('electron').remote;
+    var menu = null;
+
+    switch (menuSnapshot[typeProperty]) {
+        case mainMenuType:
+            menu = remote.Menu.getApplicationMenu();
+            break;
+
+        case contextMenuType:
+            menu = remote.getGlobal(contextMenuGlobal);
+            break;
+    }
+
+    if (!menu)
+        return;
+
+    var menuItem = menuSnapshot[indexProperty]
+        .reduce((m, i) => m.items[i].submenu || m.items[i], menu);
+
+    menuItem.click(menuItem, require('electron').remote.getCurrentWindow(), modifiers);
+}, { dependencies: CONSTANTS });
+
+const doSetElectronDialogHandler = ClientFunction(serializedHandler => {
+    var { ipcRenderer } = require('electron');
+
+    ipcRenderer.send(setHandler, serializedHandler);
+}, { dependencies: MESSAGES });
+/* eslint-enable no-undef */
+
+function startElectron (electronPath, mainPath, env) {
     var electronEnv = Object.assign({}, process.env, env);
 
     var cmd = '';
 
     if (OS.win)
-        cmd = `start /D "${path.dirname(electronPath)}" ${path.basename(electronPath)} "${appPath}`;
+        cmd = `start /D "${path.dirname(electronPath)}" ${path.basename(electronPath)} "${mainPath}"`;
     else
-        cmd = `"${electronPath}" "${appPath}" 0<&- >/dev/null 2>&1 &`;
+        cmd = `"${electronPath}" "${mainPath}" 0<&- >/dev/null 2>&1 &`;
 
     return exec(cmd, { env: electronEnv });
+}
+
+function wrapMenu (type, menu, index = []) {
+    if (!menu)
+        return null;
+
+    for (var i = 0; i < menu.items.length; i++) {
+        var currentIndex = index.concat(i);
+        var item         = menu.items[i];
+
+        item[CONSTANTS.typeProperty]  = type;
+        item[CONSTANTS.indexProperty] = currentIndex;
+
+        if (item.submenu)
+            wrapMenu(type, item.submenu, currentIndex);
+    }
+    return menu;
 }
 
 export default {
     isMultiBrowser: true,
 
-    async openBrowser (id, pageUrl, appPath) {
-        if (!isAbsolute(appPath))
-            appPath = path.resolve(process.cwd(), appPath);
+    async openBrowser (id, pageUrl, mainPath) {
+        if (!isAbsolute(mainPath))
+            mainPath = path.join(process.cwd(), mainPath);
 
         var proxyAppPath = path.join(__dirname, './proxy-app.js');
 
-        return startElectron(ELECTRON_PATH, proxyAppPath, {
-            TESTCAFE_ELECTRON_TEST_URL: pageUrl,
-            TESTCAFE_ELECTRON_APP_PATH: appPath
+        await startElectron(ELECTRON_PATH, proxyAppPath, {
+            [CONSTANTS.mainPathEnv]: mainPath,
+            [CONSTANTS.testUrlEnv]:  pageUrl
         });
     },
 
@@ -58,5 +117,25 @@ export default {
 
     async takeScreenshot (id, screenshotPath) {
         return browserTools.screenshot(id, screenshotPath);
+    },
+
+    //Helpers
+    async mainMenu () {
+        return wrapMenu(CONSTANTS.mainMenuType, await getMainMenu());
+    },
+
+    async contextMenu () {
+        return wrapMenu(CONSTANTS.contextMenuType, await getContextMenu());
+    },
+
+    async menuClick (menuSnapshot, modifiers = {}) {
+        await doMenuClick(menuSnapshot, modifiers);
+    },
+
+    async setElectronDialogHandler (fn, context) {
+        await doSetElectronDialogHandler({
+            fn:  fn.toString(),
+            ctx: context
+        });
     }
 };

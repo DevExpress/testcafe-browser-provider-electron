@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import { testPage } from '../config';
 
 
@@ -8,5 +7,5 @@ fixture `Electron page`
 test('Check page content', async t => {
     var header = await t.eval(() => document.querySelector('body > h1').textContent);
 
-    expect(header).to.be.equal('HELLO ELECTRON!');
+    await t.expect(header).eql('HELLO ELECTRON!');
 });

@@ -1,6 +1,6 @@
 var electron = require('electron');
 var path     = require('path');
-
+var dialog   = electron.dialog;
 
 var BrowserWindow = electron.BrowserWindow;
 var app           = electron.app;
@@ -8,6 +8,7 @@ var app           = electron.app;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var win = null;
+
 
 function createWindow () {
     // Create the browser window.
@@ -23,6 +24,29 @@ function createWindow () {
         // when you should delete the corresponding element.
         win = null;
     });
+
+    electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate([{
+        label: 'Test',
+
+        submenu: [
+            {
+                label: 'Click',
+
+                click () {
+                    win.webContents.executeJavaScript('window.mainMenuClicked = true');
+                }
+            },
+            {
+                label: 'Dialog',
+
+                click () {
+                    var x = dialog.showOpenDialog({ title: 'Test open' });
+
+                    win.webContents.executeJavaScript(`window.dialogResult = "${x}"`);
+                }
+            }
+        ]
+    }]));
 }
 
 // This method will be called when Electron has finished

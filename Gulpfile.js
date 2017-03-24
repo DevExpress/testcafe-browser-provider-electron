@@ -34,7 +34,7 @@ gulp.task('lint', function () {
         .pipe(eslint.failAfterError());
 });
 
-gulp.task('build', ['lint', 'clean'], function () {
+gulp.task('build', ['clean', 'lint'], function () {
     return gulp
         .src('src/**/*.js')
         .pipe(babel())

@@ -1,5 +1,4 @@
 import path from 'path';
-import { expect } from 'chai';
 import { statSync } from 'fs';
 import { tmpNameSync as getTempFileName } from 'tmp';
 import { testPage } from '../config';
@@ -14,5 +13,5 @@ test('Take screenshot', async t => {
 
     await t.takeScreenshot(screenshotName);
 
-    expect(statSync(screenshotPath).isFile()).to.be.true;
+    await t.expect(statSync(screenshotPath).isFile()).ok();
 });
