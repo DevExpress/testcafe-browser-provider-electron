@@ -14,6 +14,17 @@ import { ClientFunction } from 'testcafe';
 
 const exec = promisify(nodeExec, Promise);
 
+const simplifyMenuItemLabel = label => label.replace(/\s/g, '').toLowerCase();
+
+const MENU_ITEM_INDEX_RE = /\[(\d+)\]$/;
+
+const MODIFIERS_KEYS_MAP = {
+    'shift': 'shiftKey',
+    'ctrl':  'ctrlKey',
+    'alt':   'altKey',
+    'meta':  'metaKey'
+};
+
 /* eslint-disable no-undef */
 const getMainMenu = ClientFunction(() => {
     return require('electron').remote.Menu.getApplicationMenu();
@@ -23,11 +34,11 @@ const getContextMenu = ClientFunction(() => {
     return require('electron').remote.getGlobal(contextMenuGlobal);
 }, { dependencies: CONSTANTS });
 
-const doMenuClick = ClientFunction((menuSnapshot, modifiers) => {
+const doClickOnMenuItem = ClientFunction((menuType, menuItemIndex, modifiers) => {
     var remote = require('electron').remote;
-    var menu = null;
+    var menu   = null;
 
-    switch (menuSnapshot[typeProperty]) {
+    switch (menuType) {
         case mainMenuType:
             menu = remote.Menu.getApplicationMenu();
             break;
@@ -40,7 +51,7 @@ const doMenuClick = ClientFunction((menuSnapshot, modifiers) => {
     if (!menu)
         return;
 
-    var menuItem = menuSnapshot[indexProperty]
+    var menuItem = menuItemIndex
         .reduce((m, i) => m.items[i].submenu || m.items[i], menu);
 
     menuItem.click(menuItem, require('electron').remote.getCurrentWindow(), modifiers);
@@ -80,10 +91,35 @@ function wrapMenu (type, menu, index = []) {
         if (item.submenu)
             wrapMenu(type, item.submenu, currentIndex);
     }
+
     return menu;
 }
 
-export default {
+function findMenuItem (menu, menuItemPath) {
+    var menuItem = null;
+
+    for (let i = 0; menu && i < menuItemPath.length; i++) {
+        const indexMatch = menuItemPath[i].match(MENU_ITEM_INDEX_RE);
+        const index      = indexMatch ? Number(indexMatch[1]) - 1 : 0;
+        const label      = indexMatch ? menuItemPath[i].replace(MENU_ITEM_INDEX_RE, '') : menuItemPath[i];
+
+        menuItem = menu.items.filter(item => simplifyMenuItemLabel(item.label) === label)[index];
+
+        menu = menuItem && menuItem.submenu || null;
+    }
+
+    return menuItem || null;
+}
+
+function ensureModifiers (srcModifiers = {}) {
+    var result = {};
+
+    Object.keys(MODIFIERS_KEYS_MAP).forEach(mod => result[MODIFIERS_KEYS_MAP[mod]] = !!srcModifiers[mod]);
+
+    return result;
+}
+
+const ElectronBrowserProvider = {
     isMultiBrowser: true,
 
     async openBrowser (id, pageUrl, mainPath) {
@@ -120,16 +156,21 @@ export default {
     },
 
     //Helpers
-    async mainMenu () {
+    async getMainMenu () {
         return wrapMenu(CONSTANTS.mainMenuType, await getMainMenu());
     },
 
-    async contextMenu () {
+    async getContextMenu () {
         return wrapMenu(CONSTANTS.contextMenuType, await getContextMenu());
     },
 
-    async menuClick (menuSnapshot, modifiers = {}) {
-        await doMenuClick(menuSnapshot, modifiers);
+    async clickOnMenuItem (menuItem, modifiers = {}) {
+        var menuItemSnapshot = typeof menuItem === 'string' ? await ElectronBrowserProvider.getMenuItem(menuItem) : menuItem;
+
+        if (!menuItemSnapshot)
+            throw new Error('Invalid menu item argument');
+
+        await doClickOnMenuItem(menuItemSnapshot[CONSTANTS.typeProperty], menuItemSnapshot[CONSTANTS.indexProperty], ensureModifiers(modifiers));
     },
 
     async setElectronDialogHandler (fn, context) {
@@ -137,5 +178,17 @@ export default {
             fn:  fn.toString(),
             ctx: context
         });
+    },
+
+    async getMenuItem (menuItemSelector) {
+        var menuItemPath = menuItemSelector.split(/\s*>\s*/).map(simplifyMenuItemLabel);
+        var menu         = menuItemPath[0] === 'contextmenu' ? await ElectronBrowserProvider.getContextMenu() : await ElectronBrowserProvider.getMainMenu();
+
+        if (menuItemPath[0] === 'contextmenu' || menuItemPath[0] === 'mainmenu')
+            menuItemPath.shift();
+
+        return findMenuItem(menu, menuItemPath);
     }
 };
+
+export { ElectronBrowserProvider as default };

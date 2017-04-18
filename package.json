@@ -1,7 +1,7 @@
 {
   "name": "testcafe-browser-provider-electron",
   "version": "0.0.1",
-  "description": "electron TestCafe browser provider plugin.",
+  "description": "TestCafe browser provider plugin for testing applications built with Electron.",
   "repository": "https://github.com/DevExpress/testcafe-browser-provider-electron",
   "homepage": "https://github.com/DevExpress/testcafe-browser-provider-electron",
   "author": {
@@ -51,7 +51,7 @@
     "gulp-eslint": "^3.0.1",
     "node-version": "^1.0.0",
     "publish-please": "^2.1.4",
-    "testcafe": "alpha",
+    "testcafe": "*",
     "tmp": "0.0.28"
   }
 }

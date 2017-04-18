@@ -24,7 +24,7 @@
     "no-new-wrappers": "error",
     "no-octal-escape": "error",
     "no-proto": "error",
-    "no-return-assign": "error",
+    "no-return-assign": "off",
     "no-script-url": "error",
     "no-sequences": "error",
     "no-shadow": "error",
