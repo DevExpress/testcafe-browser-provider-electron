@@ -14,7 +14,7 @@ import { ClientFunction } from 'testcafe';
 
 const exec = promisify(nodeExec, Promise);
 
-const simplifyMenuItemLabel = label => label.replace(/\s/g, '').toLowerCase();
+const simplifyMenuItemLabel = label => label.replace(/[\s&]/g, '').toLowerCase();
 
 const MENU_ITEM_INDEX_RE = /\[(\d+)\]$/;
 
@@ -26,6 +26,12 @@ const MODIFIERS_KEYS_MAP = {
 };
 
 /* eslint-disable no-undef */
+function terminateElectron () {
+    setTimeout(function () {
+        require('electron').remote.process.exit(0);
+    }, 100);
+}
+
 const getMainMenu = ClientFunction(() => {
     return require('electron').remote.Menu.getApplicationMenu();
 });
@@ -63,6 +69,8 @@ const doSetElectronDialogHandler = ClientFunction(serializedHandler => {
     ipcRenderer.send(setHandler, serializedHandler);
 }, { dependencies: MESSAGES });
 /* eslint-enable no-undef */
+
+const TERMINATE_ELECTRON_SCRIPT = terminateElectron().toString();
 
 function startElectron (electronPath, mainPath, env) {
     var electronEnv = Object.assign({}, process.env, env);
@@ -135,7 +143,7 @@ const ElectronBrowserProvider = {
     },
 
     async closeBrowser (id) {
-        return browserTools.close(id);
+        await this.runInitScript(id, TERMINATE_ELECTRON_SCRIPT);
     },
 
     async getBrowserList () {
