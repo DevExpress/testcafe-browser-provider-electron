@@ -30,6 +30,8 @@ function terminateElectron () {
     setTimeout(function () {
         require('electron').remote.process.exit(0);
     }, 100);
+
+    return true;
 }
 
 const getMainMenu = ClientFunction(() => {
@@ -70,7 +72,7 @@ const doSetElectronDialogHandler = ClientFunction(serializedHandler => {
 }, { dependencies: MESSAGES });
 /* eslint-enable no-undef */
 
-const TERMINATE_ELECTRON_SCRIPT = terminateElectron().toString();
+const TERMINATE_ELECTRON_SCRIPT = terminateElectron.toString();
 
 function startElectron (electronPath, mainPath, env) {
     var electronEnv = Object.assign({}, process.env, env);
