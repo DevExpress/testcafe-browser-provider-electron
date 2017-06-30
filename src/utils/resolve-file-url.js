@@ -8,14 +8,14 @@ function wrapPathWithProtocol (filePath) {
     return `file://${ win ? '/' + filePath.toLowerCase().replace(/\\/g, '/') : filePath}`;
 }
 
-export default function (url, appPath) {
+export default function (basePath, url) {
     var urlPath = decodeURIComponent(url.replace(win ? /^file:\/\/\/?/ : /^file:\/\//, ''));
 
     if (isAbsolute(urlPath))
         return wrapPathWithProtocol(path.join(urlPath));
 
-    if (!statSync(appPath).isDirectory())
-        appPath = path.dirname(appPath);
+    if (!statSync(basePath).isDirectory())
+        basePath = path.dirname(basePath);
 
-    return wrapPathWithProtocol(path.join(appPath, urlPath));
+    return wrapPathWithProtocol(path.join(basePath, urlPath));
 }
