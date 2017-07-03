@@ -1,5 +1,4 @@
 {
   "mainWindowUrl": "./index.html",
-  "appPath": "./",
-  "electronPath": "D:/testcafe-studio/runners/win/electron-prebuilt/TestCafe.exe"
+  "appPath": "./"
 }

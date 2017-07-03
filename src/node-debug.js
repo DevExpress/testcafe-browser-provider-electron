@@ -34,7 +34,7 @@ module.exports = class NodeDebug {
             promisifyEvent(this.socket, 'error')
         ]);
 
-        await connectionPromise
+        return await connectionPromise
             .then(() => true)
             .catch(() => delay(RETRY_DELAY));
     }
