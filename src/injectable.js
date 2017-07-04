@@ -1,40 +1,36 @@
+import vm from 'vm';
+import resolveFileUrl from './utils/resolve-file-url';
+
+import MESSAGES from './messages';
+import CONSTANTS from './constants';
+
+
+const URL_QUERY_RE      = /\?.*$/;
+const NAVIGATION_EVENTS = ['will-navigate', 'did-navigate'];
+
+
 function install (config, testPageUrl) {
     var { BrowserWindow, Menu, ipcMain, dialog } = require('electron');
-
-    var vm             = require('vm');
-    var OS             = require('os-family');
-    var resolveFileUrl = require('./utils/resolve-file-url');
-
-    var MESSAGES      = require('./messages');
-    var CONSTANTS     = require('./constants');
-
-    var NAVIGATION_EVENTS = ['will-navigate', 'did-navigate'];
-
+    
     var { WebContents } = process.atomBinding('web_contents');
 
-    var origLoadURL    = BrowserWindow.prototype.loadURL;
+    var origLoadURL = BrowserWindow.prototype.loadURL;
 
     var electronDialogsHandler = null;
 
     global[CONSTANTS.contextMenuGlobal] = null;
 
-    function refineUrl (url) {
-        if (OS.win)
-            url = url.replace(/$file:\/\/(\w)/, 'file:///$1').toLowerCase();
-        else if (OS.mac)
-            url = url.toLowerCase();
-
-
-        return url.replace(/\?.*$/, '');
+    function stripQuery (url) {
+        return url.replace(URL_QUERY_RE, '');
     }
 
     BrowserWindow.prototype.loadURL = function (url) {
-        var testUrl = refineUrl(url);
+        var testUrl = stripQuery(url);
 
         if (url.indexOf('file:') === 0)
             testUrl = resolveFileUrl(config.appPath, testUrl);
 
-        if (testUrl === config.mainWindowUrl) {
+        if (testUrl.toLowerCase() === config.mainWindowUrl.toLowerCase()) {
             BrowserWindow.prototype.loadURL = origLoadURL;
 
             url = testPageUrl;
@@ -51,7 +47,7 @@ function install (config, testPageUrl) {
     };
 
     Menu.prototype.closePopup = function () {
-        global[CONSTANTS.contextMenuGlobal]  = null;
+        global[CONSTANTS.contextMenuGlobal] = null;
     };
 
     if (!config.enableNavigateEvents) {

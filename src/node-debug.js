@@ -3,10 +3,13 @@ var { Socket }     = require('net');
 var promisifyEvent = require('promisify-event');
 var EventEmitter   = require('events');
 
-const delay = ms => new Promise(r => setTimeout(r, ms));
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const RETRY_DELAY     = 300;
 const MAX_RETRY_COUNT = 10;
+
+const HEADER_SEPARATOR = '\r\n\r\n';
+const HEADER_LINE_RE = /^([^:]+):\s+(.*)$/;
 
 module.exports = class NodeDebug {
     constructor (port = 5858, host = '127.0.0.1') {
@@ -64,12 +67,12 @@ module.exports = class NodeDebug {
 
     _getPacket () {
         this.getPacketPromise = this.getPacketPromise.then(async () => {
-            var index = this.buffer.indexOf('\r\n\r\n');
+            var headerEndIndex = this.buffer.indexOf(HEADER_SEPARATOR);
 
-            while (index < 0) {
+            while (headerEndIndex < 0) {
                 await promisifyEvent(this.events, 'new-data');
 
-                index = this.buffer.indexOf('\r\n\r\n');
+                headerEndIndex = this.buffer.indexOf('\r\n\r\n');
             }
 
             var packet = {
@@ -78,30 +81,28 @@ module.exports = class NodeDebug {
             };
 
             packet.headers = this.buffer
-                .toString('utf8', 0, index)
+                .toString('utf8', 0, headerEndIndex)
                 .split('\r\n')
-                .map(line => line.match(/^([^:]+):\s+(.*)$/))
+                .map(line => line.match(HEADER_LINE_RE))
                 .reduce((obj, match) => {
                     obj[match[1].toLowerCase()] = match[2];
 
                     return obj;
                 }, {});
 
-            var contentLength = packet.headers['content-length'] && parseInt(packet.headers['content-length'], 10);
+            var contentLengthHeader = packet.headers['content-length'];
+            var contentLength       = contentLengthHeader && parseInt(contentLengthHeader, 10) || 0;
+            var bodyStartIndex      = headerEndIndex + HEADER_SEPARATOR.length;
+            var bodyEndIndex        = bodyStartIndex + contentLength;
 
-            if (!contentLength) {
-                this.buffer = this.buffer.slice(index + 4);
-                return packet;
+            if (contentLength) {
+                while (this.buffer.length < bodyEndIndex)
+                    await promisifyEvent(this.events, 'new-data');
+
+                packet.body = JSON.parse(this.buffer.toString('utf8', bodyStartIndex, bodyEndIndex));
             }
 
-
-            while (this.buffer.length - index - 4 < contentLength)
-                await promisifyEvent(this.events, 'new-data');
-
-
-            packet.body = JSON.parse(this.buffer.toString('utf8', index + 4, index + 4 + contentLength));
-
-            this.buffer = this.buffer.slice(index + 4 + contentLength);
+            this.buffer = this.buffer.slice(bodyEndIndex);
 
             return packet;
         });
@@ -113,7 +114,7 @@ module.exports = class NodeDebug {
         this.sendPacketPromise = this.sendPacketPromise.then(async () => {
             var body       = Object.assign({}, payload, { seq: this.currentPacketNumber++, type: 'request' });
             var serialized = JSON.stringify(body);
-            var message    = 'Content-Length: ' + Buffer.byteLength(serialized, 'utf8') + '\r\n\r\n' + serialized;
+            var message    = 'Content-Length: ' + Buffer.byteLength(serialized, 'utf8') + HEADER_SEPARATOR + serialized;
 
             this._writeSocket(message);
         });
