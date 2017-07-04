@@ -1,17 +1,14 @@
-var Promise        = require('pinkie');
-var { Socket }     = require('net');
-var promisifyEvent = require('promisify-event');
-var EventEmitter   = require('events');
-
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-const RETRY_DELAY     = 300;
-const MAX_RETRY_COUNT = 10;
+import Promise from 'pinkie';
+import { Socket } from 'net';
+import promisifyEvent from 'promisify-event';
+import EventEmitter from 'events';
+import delay from './utils/delay';
+import { connectionRetryDelay, maxConnectionRetryCount } from './constants';
 
 const HEADER_SEPARATOR = '\r\n\r\n';
 const HEADER_LINE_RE = /^([^:]+):\s+(.*)$/;
 
-module.exports = class NodeDebug {
+export default class NodeDebug {
     constructor (port = 5858, host = '127.0.0.1') {
         this.currentPacketNumber = 1;
         this.events              = new EventEmitter();
@@ -39,13 +36,16 @@ module.exports = class NodeDebug {
 
         return await connectionPromise
             .then(() => true)
-            .catch(() => delay(RETRY_DELAY));
+            .catch(() => {
+                this.socket.removeAllListeners('connect');
+                return delay(connectionRetryDelay);
+            });
     }
 
     async _connectSocket (port, host) {
         var connected = await this._attemptToConnect(port, host);
 
-        for (var i = 0; !connected && i < MAX_RETRY_COUNT; i++)
+        for (var i = 0; !connected && i < maxConnectionRetryCount; i++)
             connected = await this._attemptToConnect(port, host);
 
         if (!connected)
@@ -151,5 +151,5 @@ module.exports = class NodeDebug {
 
         return responsePacket;
     }
-};
+}
 

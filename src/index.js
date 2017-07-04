@@ -5,8 +5,9 @@ import { exec as nodeExec } from 'child_process';
 import Promise from 'pinkie';
 import OS from 'os-family';
 import promisify from 'pify';
-import nodeFreePort from 'freeport';
+import { getFreePorts } from 'endpoint-utils';
 import NodeDebug from './node-debug';
+import NodeInspect from './node-inspect';
 import isAbsolute from './utils/is-absolute';
 import getConfig from './utils/get-config';
 import getHookCode from './hook';
@@ -16,7 +17,6 @@ import CONSTANTS from './constants';
 import { ClientFunction } from 'testcafe';
 
 
-const getFreePort = promisify(nodeFreePort, Promise);
 const exec = promisify(nodeExec, Promise);
 
 const simplifyMenuItemLabel = label => label.replace(/[\s&]/g, '').toLowerCase();
@@ -79,18 +79,19 @@ const doSetElectronDialogHandler = ClientFunction(serializedHandler => {
 
 const TERMINATE_ELECTRON_SCRIPT = terminateElectron.toString();
 
-function startElectron (config, port) {
-    var cmd       = '';
-    var extraArgs = config.appArgs ? ' ' + config.appArgs.join(' ') : '';
+function startElectron (config, ports) {
+    var cmd            = '';
+    var debugPortsArgs = `--debug-brk=${ports[0]} --inspect-brk=${ports[1]}`;
+    var extraArgs      = config.appArgs ? ' ' + config.appArgs.join(' ') : '';
 
     if (OS.win)
-        cmd = `start /D "${path.dirname(config.electronPath)}" .\\${path.basename(config.electronPath)} --debug-brk=${port}${extraArgs}`;
+        cmd = `start /D "${path.dirname(config.electronPath)}" .\\${path.basename(config.electronPath)} ${debugPortsArgs}${extraArgs}`;
     else if (OS.mac && statSync(config.electronPath).isDirectory())
-        cmd = `open -n -a "${config.electronPath}" --args --debug-brk=${port}${extraArgs}`;
+        cmd = `open -n -a "${config.electronPath}" --args ${debugPortsArgs}${extraArgs}`;
     else
-        cmd = `"${config.electronPath}" --debug-brk=${port}${extraArgs} 0<&- >/dev/null 2>&1 &`;
+        cmd = `"${config.electronPath}" ${debugPortsArgs}${extraArgs} 0<&- >/dev/null 2>&1 &`;
 
-    return exec(cmd);
+    return exec(cmd, { stdio: 'inherit', shell: true });
 }
 
 function wrapMenu (type, menu, index = []) {
@@ -135,6 +136,13 @@ function ensureModifiers (srcModifiers = {}) {
     return result;
 }
 
+async function injectHookCode (client, code) {
+    await client.connect();
+    await client.evaluate(code);
+
+    client.dispose();
+}
+
 const ElectronBrowserProvider = {
     isMultiBrowser: true,
 
@@ -144,16 +152,18 @@ const ElectronBrowserProvider = {
 
         var config = getConfig(mainPath);
 
-        var port = config.port || await getFreePort();
+        var ports = await getFreePorts(2);
 
-        await startElectron(config, port);
+        await startElectron(config, ports);
 
-        var client = new NodeDebug(port);
+        var hookCode      = getHookCode(config, pageUrl);
+        var debugClient   = new NodeDebug(ports[0]);
+        var inspectClient = new NodeInspect(ports[1]);
 
-        await client.connect();
-        await client.evaluate(getHookCode(config, pageUrl));
-
-        client.dispose();
+        await Promise.race([
+            injectHookCode(debugClient, hookCode),
+            injectHookCode(inspectClient, hookCode)
+        ]);
     },
 
     async closeBrowser (id) {

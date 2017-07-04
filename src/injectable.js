@@ -11,7 +11,7 @@ const NAVIGATION_EVENTS = ['will-navigate', 'did-navigate'];
 
 function install (config, testPageUrl) {
     var { BrowserWindow, Menu, ipcMain, dialog } = require('electron');
-    
+
     var { WebContents } = process.atomBinding('web_contents');
 
     var origLoadURL = BrowserWindow.prototype.loadURL;
@@ -88,7 +88,7 @@ function install (config, testPageUrl) {
 
     dialog.showCertificateTrustDialog = (...args) => handleDialog('certificate-trust-dialog', args);
 
-    process.argv.splice(1, 1);
+    process.argv.splice(1, 2);
 }
 
 module.exports = function (config, testPageUrl) {
