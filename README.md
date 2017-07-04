@@ -19,13 +19,13 @@ First, create a `.testcafe-electron-rc` file in the root directory of your Elect
 }
 ```
 
-When you run tests from the command line, specify the path to the directory of `.testcafe-electron-rc` prefixed with "electron:" -
+When you run tests from the command line, specify the path to the directory where `.testcafe-electron-rc` resides prefixed with "electron:" -
 
 ```
 testcafe "electron:/home/user/electron-app" "path/to/test/file.js"
 ```
 
-When you use API, pass the path to the directory of `.testcafe-electron-rc` to the `browsers()` method:
+When you use API, pass the path to the directory where `.testcafe-electron-rc` resides prefixed with "electron:" to the `browsers()` method:
 
 ```js
 testCafe
@@ -46,7 +46,7 @@ __Required.__ Specifies the URL of the application's main window page.
 
 ### appPath
 
-__Optional.__ Alters path to the application which by default must be located at the [default Electron app directory](https://github.com/electron/electron/blob/master/docs/tutorial/application-distribution.md#application-distribution).
+__Optional.__ Alters path to the application, which, by default, must be located at the [default Electron app directory](https://github.com/electron/electron/blob/master/docs/tutorial/application-distribution.md#application-distribution).
  You can use the `appPath` option to override it by specifying an absolute path, or append a relative path to the path specified after the `electron:` prefix
  in the string passed to the command line or API.
 
@@ -57,7 +57,7 @@ __Optional.__ Overrides application command line arguments with the values speci
 ### electronPath
 
 __Optional__. Specifies a path to the electron binary. If `electronPath` is not specified, the [electron package](https://www.npmjs.com/package/electron) should be installed.
- On macOS it can be either a path to the `electron` binaty, or a path to the whole Electron.app (e.g. `/Applications/Electron.app`).
+ On macOS, it can be either a path to the `electron` binary, or a path to the entire Electron.app (e.g. `/Applications/Electron.app`).
 
 ### enableNavigateEvents
 
