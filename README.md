@@ -19,7 +19,7 @@ First, create a `.testcafe-electron-rc` file in the root directory of your Elect
 }
 ```
 
-When you run tests from the command line, specify the path to the directory where `.testcafe-electron-rc` resides prefixed with "electron:" -
+When you run tests from the command line, specify the path to the directory where `.testcafe-electron-rc` resides prefixed with "electron:" :
 
 ```
 testcafe "electron:/home/user/electron-app" "path/to/test/file.js"
@@ -47,8 +47,7 @@ __Required.__ Specifies the URL of the application's main window page.
 ### appPath
 
 __Optional.__ Alters path to the application, which, by default, must be located at the [default Electron app directory](https://github.com/electron/electron/blob/master/docs/tutorial/application-distribution.md#application-distribution).
- You can use the `appPath` option to override it by specifying an absolute path, or append a relative path to the path specified after the `electron:` prefix
- in the string passed to the command line or API.
+You can use the `appPath` option to override the default path by specifying a new absolute path. Alternatively, you can append a relative path to the path specified after the "electron:" prefix.
 
 ### appArgs
 
