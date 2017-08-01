@@ -20,7 +20,7 @@ function startLoadingTimeout () {
     loadingTimeout = setTimeout(() => {
         process.stdout.write(ERRORS.render(ERRORS.mainUrlWasNotLoaded, { openedUrls }));
 
-        setTimeout(process.exit(1), 100);
+        setTimeout(() => process.exit(1), 100);
     }, CONSTANTS.loadingTimeout);
 }
 
