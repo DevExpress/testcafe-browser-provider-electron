@@ -61,7 +61,7 @@ If you have a built Electron application with an executable file `<you_app_name>
     ```json
     {
         "mainWindowUrl": "./index.html",
-        "electronPath": "/home/user/myElectronApp/electron.exe"
+        "electronPath": "/home/user/myElectronApp/electron"
     }
     ```
     
