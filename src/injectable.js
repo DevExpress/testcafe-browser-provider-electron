@@ -13,12 +13,12 @@ var loadingTimeout = null;
 var openedUrls     = [];
 
 
-function startLoadingTimeout () {
+function startLoadingTimeout (mainWindowUrl) {
     if (loadingTimeout)
         return;
 
     loadingTimeout = setTimeout(() => {
-        process.stdout.write(ERRORS.render(ERRORS.mainUrlWasNotLoaded, { openedUrls }));
+        process.stdout.write(ERRORS.render(ERRORS.mainUrlWasNotLoaded, { openedUrls, mainWindowUrl }));
 
         setTimeout(() => process.exit(1), 100);
     }, CONSTANTS.loadingTimeout);
@@ -46,7 +46,7 @@ function install (config, testPageUrl) {
     }
 
     BrowserWindow.prototype.loadURL = function (url) {
-        startLoadingTimeout();
+        startLoadingTimeout(config.mainWindowUrl);
 
         var testUrl = stripQuery(url);
 
