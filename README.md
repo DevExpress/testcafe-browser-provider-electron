@@ -3,29 +3,79 @@
 
 This plugin allows you to test **Electron** applications with [TestCafe](http://devexpress.github.io/testcafe).
 
-## Install
+## Getting Started
+
+### Installation
 
 ```
 npm install testcafe-browser-provider-electron
 ```
 
-## Usage
+### Testing a JavaScript Application
 
-First, create a `.testcafe-electron-rc` file in the root directory of your Electron app. For more info, see the [Configuration](#configuration) section.
+If you have a JavaScript application that runs in Electron, you need to go through the following steps to set up testing.
 
-```
-{
-  "mainWindowUrl": "./index.html"
-}
-```
+1. Create a `.testcafe-electron-rc` file in the root application directory. Include the following settings to this file.
 
-When you run tests from the command line, specify the path to the application root directory prefixed with "electron:" :
+    ```json
+    {
+      "mainWindowUrl": "./index.html"
+    }
+    ```
 
-```
-testcafe "electron:/home/user/electron-app" "path/to/test/file.js"
-```
+    The `mainWindowUrl` option specifies the path to a file that was loaded as the application startup page. TestCafe waits for Electron to load this page and then runs tests. If a relative path is specified, it is resolved from the `.testcafe-electron-rc` file location.
 
-When you use API, pass the application path with the "electron:" prefix to the `browsers()` method:
+    For information about other options, see the [Configuration](#configuration) section.
+
+2. Install the Electron module of the required version.
+
+    ```sh
+    npm install electron@latest
+    ```
+
+    The command above installs the latest version of the Electron executable.
+
+3. Run tests defining the path to the configuration file with a browser provider postfix `electron:<path_to_testcafe-electron-rc_directory>`.
+
+    ```sh
+    testcafe "electron:/home/user/electron-app" "<tests_directory>/**/*.js"
+    ```
+
+4. If the `.testcafe-electron-rc` file is not located in the application root directory, you can specify the path to the application in the configuration file as follows.
+
+    ```json
+    {
+      "mainWindowUrl": "./index.html",
+      "appPath": "/home/user/my_app"  
+    }
+    ```
+    
+    In this instance, the `appPath` directory will be used as a working directory of the Electron application.
+    
+### Testing an Executable Electron Application
+
+If you have a built Electron application with an executable file `<you_app_name>.exe` or `electron.exe`, you do not need to install an Electron module to run tests. You only need to perform the following steps.
+
+1. In the application directory, create a `.testcafe-electron-rc` file with the following settings.
+
+    ```json
+    {
+        "mainWindowUrl": "./index.html",
+        "electronPath": "/home/user/myElectronApp/electron.exe"
+    }
+    ```
+    
+    `mainWindowUrl` points to the application startup page; `electronPath` defines the path to the executable file of your application. If you specify relative paths, they will be resolved from the `.testcafe-electron-rc` file location.
+    
+2. Run tests defining the path to the configuration file with a browser provider postfix `electron:<path_to_testcafe-electron-rc_directory>`.
+
+    ```sh
+    testcafe "electron:/home/user/electron-app" "<tests_directory>/**/*.js"
+    ```
+    
+### Launching Tests from API
+
+To launch tests through the API, specify the application path with `electron:` prefix and pass it to the `browsers` method.
 
 ```js
 testCafe
