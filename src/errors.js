@@ -4,8 +4,8 @@ import CONSTANTS from './constants';
 
 export default {
     mainUrlWasNotLoaded: dedent `
-        The page specified by the mainWindowUrl option was not loaded. 
-        It may be the one from the following list:
+        A page in the main window specified by the mainWindowUrl option was not loaded. 
+        The affected page is one of the following:
         
         {{#openedUrls}}
         {{{.}}}
