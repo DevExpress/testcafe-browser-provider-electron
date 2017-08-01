@@ -23,7 +23,7 @@ If you have a JavaScript application that runs in Electron, you need to go throu
     }
     ```
 
-    The `mainWindowUrl` option specifies the path to a file that was loaded as the application startup page. TestCafe waits for Electron to load this page and then runs tests. If a relative path is specified, it is resolved from the `.testcafe-electron-rc` file location.
+    The `mainWindowUrl` option specifies the path to a file loaded as the application startup page. TestCafe waits for Electron to load this page and then runs tests. If a relative path is specified, it is resolved from the `.testcafe-electron-rc` file location.
 
     For information about other options, see the [Configuration](#configuration) section.
 
