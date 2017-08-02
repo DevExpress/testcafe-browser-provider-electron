@@ -1,7 +1,7 @@
 # testcafe-browser-provider-electron
 [![Build Status](https://travis-ci.org/DevExpress/testcafe-browser-provider-electron.svg)](https://travis-ci.org/DevExpress/testcafe-browser-provider-electron)
 
-This plugin allows you to test **Electron** applications with [TestCafe](http://devexpress.github.io/testcafe).
+Use this plugin to test **Electron** applications witn [TestCafe](http://devexpress.github.io/testcafe).
 
 ## Getting Started
 
@@ -13,7 +13,7 @@ npm install testcafe-browser-provider-electron
 
 ### Testing a JavaScript Application
 
-If you have a JavaScript application that runs in Electron, you need to go through the following steps to set up testing.
+If your JavaScript application runs in Electron, follow these steps to set up testing.
 
 1. Create a `.testcafe-electron-rc` file in the root application directory. Include the following settings to this file.
 
@@ -23,7 +23,7 @@ If you have a JavaScript application that runs in Electron, you need to go throu
     }
     ```
 
-    The `mainWindowUrl` option specifies the path to a file loaded as the application startup page. TestCafe waits for Electron to load this page and then runs tests. If a relative path is specified, it is resolved from the `.testcafe-electron-rc` file location.
+    An Electron app has a file that is loaded as a startup page. TestCafe waits until Electron loads this page and then runs tests. Specify the path to this file with `mainWindowUrl` option. If a relative path is specified, it is resolved from the `.testcafe-electron-rc` file location.
 
     For information about other options, see the [Configuration](#configuration) section.
 
@@ -35,13 +35,13 @@ If you have a JavaScript application that runs in Electron, you need to go throu
 
     The command above installs the latest version of the Electron executable.
 
-3. Run tests defining the path to the configuration file with a browser provider postfix `electron:<path_to_testcafe-electron-rc_directory>`.
+3. Define the path to the config file. Use browser provider postfix: `electron:<path_to_testcafe-electron-rc_directory>`. Then run tests.
 
     ```sh
     testcafe "electron:/home/user/electron-app" "<tests_directory>/**/*.js"
     ```
 
-4. If the `.testcafe-electron-rc` file is not located in the application root directory, you can specify the path to the application in the configuration file as follows.
+4. The `.testcafe-electron-rc` file might be not in the application rood directory. In that case specify the path to the configuration file like this:
 
     ```json
     {
@@ -54,7 +54,7 @@ If you have a JavaScript application that runs in Electron, you need to go throu
     
 ### Testing an Executable Electron Application
 
-If you have a built Electron application with an executable file `<you_app_name>.exe` or `electron.exe`, you do not need to install an Electron module to run tests. You only need to perform the following steps.
+If your Electron app is built it has `<your_app_name>.exe` or `electron.exe` file. In that case you don't need an Electron module to run tests. Perform the following steps instead.
 
 1. In the application directory, create a `.testcafe-electron-rc` file with the following settings.
 
@@ -65,9 +65,9 @@ If you have a built Electron application with an executable file `<you_app_name>
     }
     ```
     
-    `mainWindowUrl` points to the application startup page; `electronPath` defines the path to the executable file of your application. If you specify relative paths, they will be resolved from the `.testcafe-electron-rc` file location.
+    `mainWindowUrl` points to the application startup page; `electronPath` defines the path to your application's executable file. If you specify relative paths, they will be resolved from the `.testcafe-electron-rc` file location.
     
-2. Run tests defining the path to the configuration file with a browser provider postfix `electron:<path_to_testcafe-electron-rc_directory>`.
+2. When you run tests, define the path to the configuration file. To do so, add the browser provider postfix: `electron:<path_to_testcafe-electron-rc_directory>`.
 
     ```sh
     testcafe "electron:/home/user/electron-app" "<tests_directory>/**/*.js"
