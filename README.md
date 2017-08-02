@@ -85,6 +85,28 @@ testCafe
     .run();
 ```
 
+### Specifying Target Webpage in Test Code
+
+In most cases, the target webpage is the main application page specified via the `mainWindowUrl` configuration option.
+
+```json
+{
+  "mainWindowUrl": "./index.html"
+}
+```
+
+```js
+fixture `Electron test`
+    .page('./index.html');
+```
+
+However, you can specify any application page if your app contains more than one.
+
+```js
+fixture `Electron test`
+    .page('./views/detail.html');
+```
+
 ## Configuration
 
 You can specify the following options in the `.testcafe-electron-rc` configuration file.
