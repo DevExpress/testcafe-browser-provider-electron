@@ -1,15 +1,15 @@
-import { testPage } from '../config';
 import { ClientFunction } from 'testcafe';
-import { clickOnMenuItem } from 'testcafe-browser-provider-electron';
-
+import { clickOnMenuItem, mainWindowUrl } from 'testcafe-browser-provider-electron';
 
 fixture `Menu`
-    .page(testPage);
+    .page(mainWindowUrl());
 
 const checkMainMenuClicked    = ClientFunction(() => window.mainMenuClicked);
 const checkContextMenuClicked = ClientFunction(() => window.contextMenuClicked);
 
 test('Should click on main menu', async t => {
+    await t.wait(1000);
+
     await clickOnMenuItem('Main menu > Test > Click');
 
     await t.expect(checkMainMenuClicked()).ok();

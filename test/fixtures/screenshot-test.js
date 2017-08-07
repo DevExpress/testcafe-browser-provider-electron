@@ -1,11 +1,8 @@
 import path from 'path';
 import { statSync } from 'fs';
 import { tmpNameSync as getTempFileName } from 'tmp';
-import { testPage } from '../config';
 
-
-fixture `Screenshot`
-    .page(testPage);
+fixture `Screenshot`;
 
 test('Take screenshot', async t => {
     var screenshotName = getTempFileName({ template: 'screenshot-XXXXXX.png' });

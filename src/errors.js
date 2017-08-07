@@ -1,6 +1,6 @@
 import dedent from 'dedent';
 import { render as renderTemplate } from 'mustache';
-import CONSTANTS from './constants';
+
 
 export default {
     mainUrlWasNotLoaded: dedent `
@@ -12,7 +12,11 @@ export default {
         {{/openedUrls}}
     `,
 
+    expectedDialogDidntAppear: 'Error: An expected Electron dialog didn\'t appear',
+    unexpectedDialogAppeared:  'Error: An unexpected Electron dialog appeared',
+    invalidMenuItemArgument:   'Invalid menu item argument',
+
     render (template, data) {
-        return CONSTANTS.electronErrorMarker + renderTemplate(template, data);
+        return renderTemplate(template, data);
     }
 };

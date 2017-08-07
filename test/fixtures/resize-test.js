@@ -1,9 +1,4 @@
-import { testPage } from '../config';
-
-
-fixture `Resize`
-    .page(testPage);
-
+fixture `Resize`;
 
 test('Resize test', async t => {
     await t.resizeWindow(800, 600);
