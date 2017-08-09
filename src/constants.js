@@ -6,7 +6,7 @@ export default {
     indexProperty:           '%index%',
     connectionRetryDelay:    300,
     maxConnectionRetryCount: 10,
-    loadingTimeout:          3000,
+    loadingTimeout:          30000,
 
     menuSerializableProperties: [
         'items', 'groupsMap', 'commandsMap', 'label', 'submenu', 'type', 'role', 'accelerator',
