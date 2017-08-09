@@ -13,6 +13,6 @@ export default {
         'icon', 'sublabel', 'enabled', 'visible', 'checked', 'commandId'
     ],
 
-    testUrlMarker:       'ELECTRON MAIN WINDOW URL',
+    blankPage:           'about:blank',
     testUrlMarkerRegExp: /ELECTRON\s*MAIN\s*WINDOW\s*URL/i
 };

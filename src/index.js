@@ -43,6 +43,7 @@ async function injectHookCode (client, code) {
     client.dispose();
 }
 
+
 const ElectronBrowserProvider = {
     isMultiBrowser: true,
     openedBrowsers: {},
@@ -149,7 +150,7 @@ const ElectronBrowserProvider = {
         var testRun = testRunTracker.resolveContextTestRun();
 
         if (!testRun)
-            return CONSTANTS.testUrlMarker;
+            return CONSTANTS.blankPage;
 
         var id = testRun.browserConnection.id;
 

@@ -87,7 +87,8 @@ testCafe
 
 ### Specifying Target Webpage in Test Code
 
-In most cases, the target webpage is the main application page specified via the `mainWindowUrl` configuration option.
+In most cases, the target webpage is the main application page specified via the `mainWindowUrl` configuration option. 
+You don't have to specify it in the fixture. Also you can use the `mainWindowUrl` helper.
 
 ```json
 {
@@ -96,10 +97,19 @@ In most cases, the target webpage is the main application page specified via the
 ```
 
 ```js
+fixture `Electron test`;
+```
+
+```js
+import { mainWindowUrl } from 'testcafe-browser-provider-electron';
+
+fixture `Electron test`
+    .page(mainWindowUrl());
+```
+```js
 fixture `Electron test`
     .page('./index.html');
 ```
-
 However, you can specify any application page if your app contains more than one.
 
 ```js
@@ -128,7 +138,8 @@ __Optional.__ Overrides application command line arguments with the values speci
 ### electronPath
 
 __Optional__. Specifies a path to the electron binary. If `electronPath` is not specified, the [electron package](https://www.npmjs.com/package/electron) should be installed.
- On macOS, it can be either a path to the `electron` binary, or a path to the entire Electron.app (e.g. `/Applications/Electron.app`).
+ On macOS, it can be either a path to the `electron` binary, or a path to the entire Electron.app (e.g. `/Applications/Electron.app`). It may be necessary to stop all other running 
+ instances of the specified Electron binary.
 
 ### enableNavigateEvents
 
@@ -349,6 +360,16 @@ test('Should open properties of element', async t => {
  * `error-box`,
  * `certificate-trust-dialog`.
  
+ If a handler was set using `setElectronDialogHandler`, but no dialogs were opened during test case execution, the test will be failed with the following error: 
+ ```
+ Error: An expected Electron dialog didn\'t appear
+ ```
+ 
+ Also, if a dialog appears during test case execution, but there is no installed dialog handler, the test also will be failed with the error:
+ ```
+ Error: An unexpected Electron dialog appeared
+ ```
+ 
  **Example**
  
  ```js
@@ -375,5 +396,25 @@ test('Test project opening', async t => {
 });
 ```
 
+### mainWindowUrl
+ Returns an absolute url to the tested page. If tested page url cannot be figured (e.g. is is used outside of a test context), 
+ returns `about:blank`. It can be used as a test page URL in `fixture.page` and `test.page`.
+
+ **Example**
+ 
+ ```js
+import url from 'url';
+import { mainWindowUrl } from 'testcafe-browser-provider-electron';
+
+fixture `Electron test`
+    .page(mainWindowUrl());
+
+test('Test navigation', async t => {
+    var anotherPageUrl = url.resolve(mainWindowUrl(), 'anotherPage.html');
+    
+    await t.navigateTo(anotherPageUrl);
+});
+ ```
+ 
 ## Author
 Developer Express Inc. (https://devexpress.com)
