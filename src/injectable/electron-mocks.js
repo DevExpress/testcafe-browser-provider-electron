@@ -1,6 +1,6 @@
-import { Client } from './ipc';
-import resolveFileUrl from './utils/resolve-file-url';
-import CONSTANTS from './constants';
+import { Client } from '../ipc';
+import resolveFileUrl from '../utils/resolve-file-url';
+import CONSTANTS from '../constants';
 
 
 const URL_QUERY_RE      = /\?.*$/;
@@ -52,7 +52,11 @@ function handleDialog (type, args) {
     return handlerResult;
 }
 
-function install (config, testPageUrl) {
+module.exports = function install (config, testPageUrl) {
+    ipc = new Client(config, { dialogHandler, contextMenuHandler, windowHandler });
+
+    ipc.connect();
+
     var { BrowserWindow, Menu, dialog } = require('electron');
 
     var { WebContents } = process.atomBinding('web_contents');
@@ -122,29 +126,5 @@ function install (config, testPageUrl) {
     dialog.showCertificateTrustDialog = (...args) => handleDialog('certificate-trust-dialog', args);
 
     process.argv.splice(1, 2);
-}
-
-module.exports = function (config, testPageUrl) {
-    ipc = new Client(config, { dialogHandler, contextMenuHandler, windowHandler });
-
-    ipc.connect();
-
-    var Module = require('module');
-
-    var origModuleLoad = Module._load;
-
-    Module._load = function (...args) {
-        if (args[2]) {
-            if (config.appPath)
-                args[0] = config.appPath;
-            else
-                config.appPath = require.resolve(args[0]);
-
-            install(config, testPageUrl);
-            Module._load = origModuleLoad;
-        }
-
-        return origModuleLoad.apply(this, args);
-    };
 };
 
