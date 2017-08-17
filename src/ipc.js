@@ -1,5 +1,6 @@
 import vm from 'vm';
 import Promise from 'pinkie';
+import { pick as pickObjectProperties, transform as transformObjectProperties } from 'lodash';
 import { IPC } from 'node-ipc';
 import CONSTANTS from './constants';
 import MESSAGES from './messages';
@@ -7,12 +8,12 @@ import MESSAGES from './messages';
 
 export class Server {
     constructor (config) {
-        this.id            = config.serverId;
-        this.ipc           = new IPC();
-        this.server        = null;
-        this.socket        = null;
-        this.socketPromise = null;
-        this.injectingStatus = null;
+        this.id                     = config.serverId;
+        this.ipc                    = new IPC();
+        this.server                 = null;
+        this.socket                 = null;
+        this.socketPromise          = null;
+        this.injectingStatus        = null;
         this.injectingStatusPromise = null;
     }
 
@@ -23,10 +24,7 @@ export class Server {
                 resolve(result);
             });
 
-            if (data)
-                this.server.emit(this.socket, event, data);
-            else
-                this.server.emit(this.socket, event);
+            this.server.emit(this.socket, event, data);
         });
     }
 
@@ -92,10 +90,7 @@ export class Server {
     }
 
     async clickOnMenuItem (menuType, menuItemProperties, modifiers) {
-        var descriptiveProperties = JSON.parse(JSON.stringify(menuItemProperties, [
-            CONSTANTS.menuPathProperty,
-            'commandId'
-        ]));
+        var descriptiveProperties = pickObjectProperties(menuItemProperties, [CONSTANTS.menuPathProperty, 'commandId']);
 
         return await this._emitWithResponse(MESSAGES.clickOnMenuItem, [menuType, descriptiveProperties, modifiers]);
     }
@@ -153,29 +148,21 @@ export class Client {
     }
 
     _serializeMenuItems (menuItems) {
-        var x = JSON.parse(JSON.stringify(menuItems, (key, value) => {
-            if (!key || CONSTANTS.menuItemSerializableProperties.indexOf(key) >= 0 || Number.isInteger(Number(key)))
-                return value;
+        return menuItems
+            .map(menuItem => transformObjectProperties(menuItem, (result, value, key) => {
+                if (CONSTANTS.menuItemSerializableProperties.indexOf(key) >= 0)
+                    result[key] = value;
 
-            if (key === 'submenu' && value)
-                return value.items;
-
-            return void 0;
-        }));
-
-        return x;
+                if (key === 'submenu' && value)
+                    result[key] = this._serializeMenuItems(value.items);
+            }, {}));
     }
 
     _getMenu (menuType) {
-        switch (menuType) {
-            case CONSTANTS.mainMenuType:
-                return require('electron').Menu.getApplicationMenu();
+        if (menuType === CONSTANTS.mainMenuType)
+            return require('electron').Menu.getApplicationMenu();
 
-            case CONSTANTS.contextMenuType:
-                return this.contextMenuHandler.menu;
-        }
-
-        return null;
+        return menuType === CONSTANTS.contextMenuType ? this.contextMenuHandler.menu : null;
     }
 
     setDialogHandler (fn, context) {

@@ -7,7 +7,7 @@ Use this plugin to test **Electron** applications witn [TestCafe](http://devexpr
 
 ### Installation
 
-```
+```sh
 npm install testcafe-browser-provider-electron
 ```
 
@@ -46,7 +46,7 @@ If your JavaScript application runs in Electron, follow these steps to set up te
     ```json
     {
       "mainWindowUrl": "./index.html",
-      "appPath": "/home/user/my_app"  
+      "appPath":       "/home/user/my_app"  
     }
     ```
     
@@ -61,7 +61,7 @@ If your Electron app is built it has `<your_app_name>.exe` or `electron.exe` fil
     ```json
     {
         "mainWindowUrl": "./index.html",
-        "electronPath": "/home/user/myElectronApp/electron"
+        "electronPath":  "/home/user/myElectronApp/electron"
     }
     ```
     
@@ -164,10 +164,10 @@ Parameter          | Type   | Description
  * `Context Menu > Undo`
 
 
- If there are several menu items with the same label on the same level, you can specify an one-based "index"
+ If there are several menu items with the same label on the same level, you can specify a one-based "index"
  property:
 
- * `['Window', {label: 'My Window', index: 1}]`
+ * `['Window', {label: 'My Window', index: 2}]`
 
  This value corresponds to the second menu item with label `My Window` in the `Window` menu.
 
@@ -191,7 +191,7 @@ test('Check the menu item role', async t => {
 
 ### getContextMenuItem
 
-Gets a snapshot of the specified menu item from the **last** opened context menu.
+Gets a snapshot of the specified menu item from the **most recently** opened context menu.
 
 ```js
 async function getContextMenuItem (menuItemSelector)
@@ -206,7 +206,7 @@ Parameter          | Type   | Description
  * `['Go To', 'Declaration']`
  * `['Go To', { label: 'Declaration' }]`
 
- If there are several menu items with the same label on the same level, you can specify an one-based "index"
+ If there are several menu items with the same label on the same level, you can specify a one-based "index"
  property:
 
  * `['Go To', {label: 'My Function', index: 2}]`
@@ -235,9 +235,9 @@ test('Check the menu item role', async t => {
 
  ### getMainMenuItems
 
- Gets an array of snapshots of the items of the application main menu. If some item has a submenu, it also will be represented as an array of snapshots.
+Gets an array of snapshots of the application's main menu items. If an item has a submenu, it will also be represented as an array of snapshots.
 
- ```
+ ```js
  async function getMainMenuItems ()
  ```
 
@@ -261,9 +261,9 @@ test('Menu should contains the proper list of items', async t => {
 
  ### getContextMenuItems
 
- Gets an array of snapshots of the items of the **last** opened context menu. If some item has a submenu, it also will be represented as an array of snapshots.
+Gets an array of item snapshots from the **most recently** opened context menu. If an item has a submenu, it will also be represented as an array of snapshots.
 
- ```
+ ```js
  async function getContextMenuItems ()
  ```
 
@@ -289,9 +289,9 @@ test('Context menu should contains the proper list of items', async t => {
 
  ### clickOnMainMenuItem
 
- Performs a click on the specified main menu item `menuItem`.
+ Performs a click on the specified main menu item (`menuItem`).
 
- ```
+ ```js
  async function clickOnMainMenuItem (menuItem, modifiers)
  ```
 
@@ -304,12 +304,12 @@ test('Context menu should contains the proper list of items', async t => {
 
  Use the `modifiers` parameter to specify state of the control keys (`Shift`, `Ctrl`, `Alt`, `Meta`). The default value is
 
- ```
+ ```json
  {
-     shift: false,
-     ctrl: false,
-     alt: false,
-     meta: false
+     "shift": false,
+     "ctrl":  false,
+     "alt":   false,
+     "meta":  false
  }
   ```
 
@@ -349,9 +349,9 @@ test('Should create new file', async t => {
 
 ### clickOnContextMenuItem
 
- Performs a click on the specified main menu item `menuItem` of the **last** opened context menu.
+Performs a click on the specified menu item (`menuItem`) of the **most recently** opened context menu.
 
- ```
+ ```js
  async function clickOnContextMenuItem (menuItem, modifiers)
  ```
 
@@ -364,12 +364,12 @@ test('Should create new file', async t => {
 
  Use the `modifiers` parameter to specify state of the control keys (`Shift`, `Ctrl`, `Alt`, `Meta`). The default value is
 
- ```
+ ```json
  {
-     shift: false,
-     ctrl: false,
-     alt: false,
-     meta: false
+     "shift": false,
+     "ctrl":  false,
+     "alt":   false,
+     "meta":  false
  }
   ```
 
@@ -395,8 +395,8 @@ test('Should open properties of element', async t => {
 
  Sets a function that will handle native Electron dialogs.
 
- ```
- async function setElectronDialogHandler (handler, dependencies)
+ ```js
+ async function setElectronDialogHandler (handler, dependencies) 
  ```
 
   Parameter          | Type   | Description
@@ -406,7 +406,7 @@ test('Should open properties of element', async t => {
 
  The `handler` function has the following signature.
 
- ```
+ ```js
  function handler (type, ...args)
  ```
 
