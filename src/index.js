@@ -147,6 +147,10 @@ const ElectronBrowserProvider = {
 
     async getMainMenuItem (menuItemSelector) {
         return ElectronBrowserProvider._getBrowserHelpers().getMainMenuItem(menuItemSelector);
+    },
+
+    async getContextMenuItem (menuItemSelector) {
+        return ElectronBrowserProvider._getBrowserHelpers().getContextMenuItem(menuItemSelector);
     }
 };
 
