@@ -17,7 +17,7 @@ test('Should retrieve all main menu items', async t => {
     var items = await getMainMenuItems();
 
     await t
-        .expect(items[0].label).eql('Test')
+        .expect(items[0].label).eql('&Test')
         .expect(items[0].submenu[0].label).eql('Click')
         .expect(items[0].submenu[1].label).eql('Dialog')
         .expect(items[0].submenu[2].label).eql('New Menu')
@@ -37,7 +37,7 @@ test('Should retrieve main menu snapshot [Indexes]', async t => {
 });
 
 test('Should retrieve main menu snapshot [Labels & Indexes]', async t => {
-    let snapshot = await getMainMenuItem(['Test', 'New Menu']);
+    let snapshot = await getMainMenuItem(['&Test', 'New Menu']);
 
     await t.expect(snapshot.sublabel).eql('item 3');
 

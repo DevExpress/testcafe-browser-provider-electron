@@ -2,7 +2,6 @@ import path from 'path';
 import { statSync } from 'fs';
 import { spawn } from 'child_process';
 import Promise from 'pinkie';
-import browserTools from 'testcafe-browser-tools';
 import OS from 'os-family';
 import { getFreePorts } from 'endpoint-utils';
 import NodeDebug from './node-debug';
@@ -115,12 +114,8 @@ const ElectronBrowserProvider = {
         return true;
     },
 
-    async resizeWindow (id, width, height, currentWidth, currentHeight) {
-        return browserTools.resize(id, currentWidth, currentHeight, width, height);
-    },
-
-    async takeScreenshot (id, screenshotPath) {
-        return browserTools.screenshot(id, screenshotPath);
+    async isLocalBrowser () {
+        return true;
     },
 
     //Helpers

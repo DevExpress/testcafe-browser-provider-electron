@@ -26,7 +26,7 @@ function createWindow () {
     });
 
     electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate([{
-        label: 'Test',
+        label: '&Test',
 
         submenu: [
             {

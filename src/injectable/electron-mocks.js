@@ -3,7 +3,7 @@ import resolveFileUrl from '../utils/resolve-file-url';
 import CONSTANTS from '../constants';
 
 
-const URL_QUERY_RE      = /\?.*$/;
+const URL_QUERY_RE      = /\?(.*)$/;
 const NAVIGATION_EVENTS = ['will-navigate', 'did-navigate'];
 
 var ipc                = null;
@@ -64,21 +64,34 @@ module.exports = function install (config, testPageUrl) {
     var origLoadURL = BrowserWindow.prototype.loadURL;
 
 
-    function stripQuery (url) {
-        return url.replace(URL_QUERY_RE, '');
+    function parseUrl (url) {
+        const queryMatch = url.match(URL_QUERY_RE);
+
+        return {
+            url:   url.replace(URL_QUERY_RE, ''),
+            query: queryMatch && queryMatch[1]
+        };
+    }
+
+    function buildUrl (parsedUrl) {
+        if (!parsedUrl.query)
+            return parsedUrl.url;
+
+        return parsedUrl.url + '?' + parsedUrl.query;
     }
 
     BrowserWindow.prototype.loadURL = function (url) {
         startLoadingTimeout(config.mainWindowUrl);
 
-        var testUrl = stripQuery(url);
+        var parsedTestUrl = parseUrl(url);
+        var parsedMainUrl = parseUrl(config.mainWindowUrl);
 
-        if (url.indexOf('file:') === 0)
-            testUrl = resolveFileUrl(config.appPath, testUrl);
+        if (parsedTestUrl.url.indexOf('file:') === 0)
+            parsedTestUrl.url = resolveFileUrl(config.appPath, parsedTestUrl.url);
 
-        openedUrls.push(testUrl);
+        openedUrls.push(buildUrl(parsedTestUrl));
 
-        if (testUrl.toLowerCase() === config.mainWindowUrl.toLowerCase()) {
+        if (parsedTestUrl.url.toLowerCase() === parsedMainUrl.url.toLowerCase()) {
             stopLoadingTimeout();
 
             ipc.sendInjectingStatus({ completed: true });

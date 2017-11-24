@@ -9,6 +9,14 @@ const MODIFIERS_KEYS_MAP = {
     'meta':  'metaKey'
 };
 
+function compareLabels (actualLabel, expectedLabel) {
+    // NOTE: Labels can contain accelerator key marker (&), that is invisible in GUI, but presents in the 'label' property.
+    // Remove accelerator marker if it's not in the expected label.
+    const refinedLabel = expectedLabel.indexOf('&') > -1 ? actualLabel : actualLabel.replace(/&/g, '');
+
+    return refinedLabel === expectedLabel;
+}
+
 function addMenuPaths (menuItems, prevPath = []) {
     menuItems.forEach(menuItem => {
         menuItem[CONSTANTS.menuPathProperty] = prevPath;
@@ -27,7 +35,7 @@ function findMenuItem (menuItems, menuItemSelector) {
         const index = menuItemSelector[i].index ? menuItemSelector[i].index - 1 : 0;
         const label = typeof menuItemSelector[i] === 'string' ? menuItemSelector[i] : menuItemSelector[i].label;
 
-        menuItem = label ? menuItems.filter(item => item.label === label)[index] : menuItems[index];
+        menuItem = label ? menuItems.filter(item => compareLabels(item.label, label))[index] : menuItems[index];
 
         menuItems = menuItem && menuItem.submenu || null;
     }
