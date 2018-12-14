@@ -45,9 +45,6 @@ function test () {
     return childProcess.spawn(testCafeCmd, ['electron:' + appPath, 'test/fixtures/**/*test.js', '-s', '.screenshots'], { stdio: 'inherit' });
 }
 
-module.exports = { 
-    lint:  lint, 
-    build: gulp.series(clean, lint, build), 
-    test:  gulp.series(build, test) 
-};
-
+exports.lint  = lint;
+exports.build = gulp.parallel(lint, gulp.series(clean, build));
+exports.test  = gulp.series(exports.build, test); 
