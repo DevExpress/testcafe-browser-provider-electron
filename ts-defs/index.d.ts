@@ -10,10 +10,10 @@ declare module 'testcafe-browser-provider-electron' {
         | 'Undo';
 
     interface Modifiers {
-        shift: boolean;
-        ctrl: boolean;
-        alt: boolean;
-        meta: boolean;
+        shift?: boolean;
+        ctrl?: boolean;
+        alt?: boolean;
+        meta?: boolean;
     }
 
     type HandlerType =
