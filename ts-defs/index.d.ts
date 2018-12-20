@@ -1,14 +1,6 @@
 import { Accelerator, BrowserWindow, NativeImage, MenuItem, Menu } from "electron";
 
 declare module 'testcafe-browser-provider-electron' {
-    type DefinedMenuItemsActions =
-        | 'File'
-        | 'Open'
-        | 'Window'
-        | 'Main Menu'
-        | 'Edit'
-        | 'Undo';
-
     interface Modifiers {
         shift?: boolean;
         ctrl?: boolean;
@@ -25,10 +17,10 @@ declare module 'testcafe-browser-provider-electron' {
 
     type HandlerFn = (type: HandlerType, browserWindow?: BrowserWindow, ...args: any[]) => any;
 
-    export function getMainMenuItem(menuItemSelector: string[] | string | DefinedMenuItemsActions | [string, { label: string, index: number }]): Promise<MenuItem>;
+    export function getMainMenuItem(menuItemSelector: string[] | string | [string, { label: string, index: number }]): Promise<MenuItem>;
     export function getMainMenuItems(): Promise<MenuItem[]>;
 
-    export function getContextMenuItem(menuItemSelector: string[] | string | DefinedMenuItemsActions | [string, { label: string, index: number }]): Promise<MenuItem>
+    export function getContextMenuItem(menuItemSelector: string[] | string | [string, { label: string, index: number }]): Promise<MenuItem>
     export function getContextMenuItems(): Promise<Menu[]>;
 
     export function clickOnMainMenuItem(menuItem: string | MenuItem, modifiers?: Modifiers): Promise<void>;
