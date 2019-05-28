@@ -2,7 +2,6 @@ import { Client } from '../ipc';
 import resolveFileUrl from '../utils/resolve-file-url';
 import CONSTANTS from '../constants';
 
-
 const URL_QUERY_RE      = /\?.*$/;
 const NAVIGATION_EVENTS = ['will-navigate', 'did-navigate'];
 
@@ -63,17 +62,22 @@ module.exports = function install (config, testPageUrl) {
 
     var origLoadURL = BrowserWindow.prototype.loadURL;
 
+    var originLoadFile = BrowserWindow.prototype.loadFile;
 
     function stripQuery (url) {
         return url.replace(URL_QUERY_RE, '');
     }
 
-    BrowserWindow.prototype.loadURL = function (url) {
+    function isFileProtocol (url) {
+        return url.indexOf('file:') === 0;
+    }
+
+    function overrideOpenUrlFn (originOpenUrlFnName, originOpenUrlFn, context, url, options) {
         startLoadingTimeout(config.mainWindowUrl);
 
         var testUrl = stripQuery(url);
 
-        if (url.indexOf('file:') === 0)
+        if (isFileProtocol(url))
             testUrl = resolveFileUrl(config.appPath, testUrl);
 
         openedUrls.push(testUrl);
@@ -83,7 +87,7 @@ module.exports = function install (config, testPageUrl) {
 
             ipc.sendInjectingStatus({ completed: true });
 
-            BrowserWindow.prototype.loadURL = origLoadURL;
+            BrowserWindow.prototype[originOpenUrlFnName] = originOpenUrlFn;
 
             url = testPageUrl;
 
@@ -93,7 +97,15 @@ module.exports = function install (config, testPageUrl) {
                 this.webContents.openDevTools();
         }
 
-        return origLoadURL.call(this, url);
+        return originOpenUrlFn.call(context, url, options);
+    }
+
+    BrowserWindow.prototype.loadURL = function (url, options) {
+        return overrideOpenUrlFn('loadURL', origLoadURL, this, url, options);
+    };
+
+    BrowserWindow.prototype.loadFile = function (filePath, options) {
+        return overrideOpenUrlFn('loadFile', originLoadFile, this, filePath, options);
     };
 
     Menu.prototype.popup = function () {
