@@ -1,9 +1,6 @@
 import { Client } from '../ipc';
 import resolveFileUrl from '../utils/resolve-file-url';
 import CONSTANTS from '../constants';
-import path from 'path';
-import { format as urlFormat } from 'url';
-import { statSync } from 'fs';
 
 const URL_QUERY_RE      = /\?.*$/;
 const NAVIGATION_EVENTS = ['will-navigate', 'did-navigate'];
@@ -65,6 +62,8 @@ module.exports = function install (config, testPageUrl) {
 
     var origLoadURL = WebContents.prototype.loadURL;
 
+    var origGetAppPath = app.getAppPath;
+
     function stripQuery (url) {
         return url.replace(URL_QUERY_RE, '');
     }
@@ -73,27 +72,13 @@ module.exports = function install (config, testPageUrl) {
         return url.indexOf('file:') === 0;
     }
 
-    function getCustomAppPathDir () {
-        let customAppPath = null;
-
-        if (!config.appPath)
-            return customAppPath;
-
-        customAppPath = config.appPath;
-
-        if (!statSync(customAppPath).isDirectory())
-            customAppPath = path.dirname(customAppPath);
-
-        return customAppPath;
-    }
-
     WebContents.prototype.loadURL = function (url, options) {
         startLoadingTimeout(config.mainWindowUrl);
 
         let testUrl = stripQuery(url);
 
         if (isFileProtocol(url))
-            testUrl = resolveFileUrl(config.appPath, testUrl);
+            testUrl = resolveFileUrl(config.appEntryPoint, testUrl);
 
         openedUrls.push(testUrl);
 
@@ -115,18 +100,8 @@ module.exports = function install (config, testPageUrl) {
         return origLoadURL.call(this, url, options);
     };
 
-    WebContents.prototype.loadFile = function (filePath, options = {}) {
-        const { query, search, hash } = options;
-        const resolvedURL             = path.resolve(getCustomAppPathDir() || app.getAppPath(), filePath);
-
-        return this.loadURL(urlFormat({
-            protocol: 'file',
-            slashes:  true,
-            pathname: resolvedURL,
-            query,
-            search,
-            hash
-        }));
+    app.getAppPath = function () {
+        return config.appPath || origGetAppPath.call(this);
     };
 
     Menu.prototype.popup = function () {
