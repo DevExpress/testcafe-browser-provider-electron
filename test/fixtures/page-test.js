@@ -1,4 +1,4 @@
-import { testPage } from '../config';
+import { testPage } from '../config.json';
 
 
 fixture `Electron page`

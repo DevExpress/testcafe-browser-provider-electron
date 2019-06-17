@@ -5,7 +5,7 @@ import {
     clickOnContextMenuItem
 } from 'testcafe-browser-provider-electron';
 
-import { testPage } from '../config';
+import { testPage } from '../config.json';
 
 
 fixture `Context Menu`
