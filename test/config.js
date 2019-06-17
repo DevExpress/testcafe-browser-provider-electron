@@ -29,7 +29,7 @@ class Config {
 
         config.testPage = testPage;
 
-        fs.writeFileSync('./test/config.json', JSON.stringify(config));
+        fs.writeFileSync('./test/config.json', JSON.stringify(config)+ '\r\n');
     }
 
     reset () {
