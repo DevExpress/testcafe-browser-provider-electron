@@ -2,16 +2,12 @@ import { readFileSync, statSync } from 'fs';
 import path from 'path';
 import resolveFileUrl from './resolve-file-url';
 import isAbsolute from './is-absolute';
-import isAsarPath from './is-asar-path';
 import CONSTANTS from '../constants';
 
 
 const PROTOCOL_RE = /^([\w-]+?)(?=\:\/\/)/;
 
 export default function (id, mainPath) {
-    if (isAsarPath(mainPath))
-        mainPath = path.dirname(mainPath); // NOTE: asar archive directory
-
     if (statSync(mainPath).isDirectory())
         mainPath = path.join(mainPath, CONSTANTS.configFileName);
 

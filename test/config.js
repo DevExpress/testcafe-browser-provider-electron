@@ -12,7 +12,7 @@ class Config {
     }
 
     static _getAppPathAsar () {
-        return 'test/test-app.asar';
+        return 'test';
     }
 
     static _getTestPage () {
