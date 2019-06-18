@@ -1,3 +1,4 @@
+var fs           = require('fs');
 var path         = require('path');
 var gulp         = require('gulp');
 var babel        = require('gulp-babel');
@@ -5,11 +6,21 @@ var eslint       = require('gulp-eslint');
 var del          = require('del');
 var childProcess = require('child_process');
 var OS           = require('os-family');
-var testConfig   = require('./test/config');
+var asar         = require('asar');
 
 
 var PACKAGE_PARENT_DIR  = path.join(__dirname, '../');
 var PACKAGE_SEARCH_PATH = (process.env.NODE_PATH ? process.env.NODE_PATH + path.delimiter : '') + PACKAGE_PARENT_DIR;
+
+process.env.NODE_PATH = PACKAGE_SEARCH_PATH;
+
+var APP_DIR             = path.join(__dirname, 'test/test-app-regular');
+var ASAR_ARCHIVE_PATH   = path.join(__dirname, 'test/test-app.asar');
+var CONFIG_PATH_REGULAR = path.join(__dirname, 'test/app-config-regular');
+var CONFIG_PATH_ASAR    = path.join(__dirname, 'test/app-config-asar');
+var TESTCAFE_CMD        = OS.win
+                            ? path.join(__dirname, 'node_modules/.bin/testcafe') + '.cmd'
+                            : path.join(__dirname, 'node_modules/.bin/testcafe');
 
 function clean () {
     return del(['lib', '.screenshots']);
@@ -34,42 +45,33 @@ function build () {
         .pipe(gulp.dest('lib'));
 }
 
-function test () {
-    var testCafeCmd = path.join(__dirname, 'node_modules/.bin/testcafe');
+function testRegularApp () {
+    delete process.env.ASAR_MODE;
 
-    if (OS.win)
-        testCafeCmd += '.cmd';
-
-    process.env.NODE_PATH = PACKAGE_SEARCH_PATH;
-
-    return childProcess.spawn(testCafeCmd, ['electron:' + testConfig.appPath, 'test/fixtures/**/*test.js', '-s', '.screenshots'], { stdio: 'inherit' });
+    return childProcess.spawn(TESTCAFE_CMD, ['electron:' + CONFIG_PATH_REGULAR, 'test/fixtures/**/*-test.js', '-s', '.screenshots'], { stdio: 'inherit' });
 }
 
-gulp.task('switch-test-config-to-asar-app', done => {
-    testConfig.switchToAsarApp();
+gulp.task('pack-to-asar-archive', () => asar.createPackage(APP_DIR, ASAR_ARCHIVE_PATH));
 
-    done();
-});
+function testAsarApp () {
+    process.env.ASAR_MODE = 'true';
 
-gulp.task('switch-test-config-to-unpacked-app', done => {
-    testConfig.switchToUnpackedApp();
+    return childProcess.spawn(TESTCAFE_CMD, ['electron:' + CONFIG_PATH_ASAR, 'test/fixtures/**/*-test.js', '-s', '.screenshots'], { stdio: 'inherit' });
+}
 
-    done();
-});
-
-gulp.task('reset-test-config', done => {
-    testConfig.reset();
+gulp.task('remove-asar-archive', done => {
+    if (fs.existsSync(ASAR_ARCHIVE_PATH))
+        fs.unlinkSync(ASAR_ARCHIVE_PATH);
 
     done();
 });
 
 exports.lint  = lint;
-exports.build = gulp.parallel(/*lint, */gulp.series(clean, build));
+exports.build = gulp.parallel(lint, gulp.series(clean, build));
 exports.test  = gulp.series(
     exports.build,
-    'switch-test-config-to-unpacked-app',
-    test,
-    'switch-test-config-to-asar-app',
-    test,
-    'reset-test-config'
+    testRegularApp,
+    'pack-to-asar-archive',
+    testAsarApp,
+    'remove-asar-archive'
 );

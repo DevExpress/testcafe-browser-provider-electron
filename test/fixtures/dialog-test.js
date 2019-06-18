@@ -1,6 +1,6 @@
 import { ClientFunction } from 'testcafe';
 import { setElectronDialogHandler, clickOnMainMenuItem } from 'testcafe-browser-provider-electron';
-import { testPage } from '../config.json';
+import { testPage } from '../config';
 
 
 fixture `Dialog`

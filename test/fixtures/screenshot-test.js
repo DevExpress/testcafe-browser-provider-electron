@@ -1,7 +1,7 @@
 import path from 'path';
 import { statSync } from 'fs';
 import { tmpNameSync as getTempFileName } from 'tmp';
-import { testPage } from '../config.json';
+import { testPage } from '../config';
 
 
 fixture `Screenshot`
