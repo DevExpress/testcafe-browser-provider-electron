@@ -18,9 +18,7 @@ var APP_DIR             = path.join(__dirname, 'test/test-app-regular');
 var ASAR_ARCHIVE_PATH   = path.join(__dirname, 'test/test-app.asar');
 var CONFIG_PATH_REGULAR = path.join(__dirname, 'test/app-config-regular');
 var CONFIG_PATH_ASAR    = path.join(__dirname, 'test/app-config-asar');
-var TESTCAFE_CMD        = OS.win
-                            ? path.join(__dirname, 'node_modules/.bin/testcafe') + '.cmd'
-                            : path.join(__dirname, 'node_modules/.bin/testcafe');
+var TESTCAFE_CMD        = path.join(__dirname, 'node_modules/.bin/testcafe') + (OS.win ? '.cmd' : '');
 
 function clean () {
     return del(['lib', '.screenshots']);
