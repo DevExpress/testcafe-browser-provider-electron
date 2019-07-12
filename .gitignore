@@ -3,4 +3,4 @@
 lib
 node_modules
 /package-lock.json
-/test/test-app.asar
+/test/data/test-app.asar

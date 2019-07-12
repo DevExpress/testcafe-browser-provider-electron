@@ -12,10 +12,10 @@ var PACKAGE_SEARCH_PATH = (process.env.NODE_PATH ? process.env.NODE_PATH + path.
 
 process.env.NODE_PATH = PACKAGE_SEARCH_PATH;
 
-var APP_DIR             = path.join(__dirname, 'test/test-app-regular');
-var ASAR_ARCHIVE_PATH   = path.join(__dirname, 'test/test-app.asar');
-var CONFIG_PATH_REGULAR = path.join(__dirname, 'test/app-config-regular');
-var CONFIG_PATH_ASAR    = path.join(__dirname, 'test/app-config-asar');
+var APP_DIR             = path.join(__dirname, 'test/data/test-app-regular');
+var ASAR_ARCHIVE_PATH   = path.join(__dirname, 'test/data/test-app.asar');
+var CONFIG_PATH_REGULAR = path.join(__dirname, 'test/data/app-config-regular');
+var CONFIG_PATH_ASAR    = path.join(__dirname, 'test/data/app-config-asar');
 
 function clean () {
     return del(['lib', '.screenshots']);
