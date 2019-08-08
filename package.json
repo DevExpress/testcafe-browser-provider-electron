@@ -56,7 +56,7 @@
     "gulp-babel": "^7.0.0",
     "gulp-eslint": "^3.0.1",
     "publish-please": "^5.4.3",
-    "testcafe": "1.4.0-rc.2",
+    "testcafe": "1.4.0",
     "tmp": "0.0.28"
   },
   "types": "./ts-defs/index.d.ts"
