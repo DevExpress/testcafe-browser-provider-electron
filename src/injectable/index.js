@@ -1,3 +1,5 @@
+import { sep } from 'path';
+
 module.exports = function (config, testPageUrl) {
     var Module = require('module');
 
@@ -5,7 +7,9 @@ module.exports = function (config, testPageUrl) {
 
     Module._load = function (...args) {
         const isMain               = args[2];
-        const isDefaultElectronApp = isMain && args[0].endsWith('electron\\dist\\resources\\default_app.asar\\main.js');
+        const isDefaultElectronApp = isMain && args[0].endsWith(
+            'electron' + sep + 'dist' + sep + 'resources' + sep + 'default_app.asar' + sep + 'main.js'
+        );
 
         if (isDefaultElectronApp) {
             if (config.appPath) {
