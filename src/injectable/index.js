@@ -6,12 +6,12 @@ module.exports = function (config, testPageUrl) {
     var origModuleLoad = Module._load;
 
     Module._load = function (...args) {
-        const isMain               = args[2];
-        const isDefaultElectronApp = isMain && args[0].endsWith(
-            'electron' + sep + 'dist' + sep + 'resources' + sep + 'default_app.asar' + sep + 'main.js'
-        );
+        const isMain                     = args[2];
+        const isNotBrowserInitMainModule = isMain &&
+            args[0] !== 'electron/js2c/browser_init' && // >= Electron v7.0.0
+            !args[0].endsWith('electron.asar' + sep + 'browser' + sep + 'init.js'); // <= Electron v6.1.5
 
-        if (isDefaultElectronApp) {
+        if (isNotBrowserInitMainModule) {
             if (config.appPath) {
                 config.appEntryPoint = require.resolve(config.appPath);
 
