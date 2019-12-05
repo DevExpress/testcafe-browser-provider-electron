@@ -1,5 +1,15 @@
 import { sep } from 'path';
 
+
+const ELECTRON_BROWSER_INIT_PATHS = [
+    'electron/js2c/browser_init', // NOTE: >= Electron v7.0.0
+    ['electron.asar', 'browser', 'init.js'].join(sep) // NOTE: <= Electron v6.1.5
+];
+
+function isBrowserInitModule (path) {
+    return ELECTRON_BROWSER_INIT_PATHS.some(initPath => path.endsWith(initPath));
+}
+
 module.exports = function (config, testPageUrl) {
     var Module = require('module');
 
@@ -7,9 +17,7 @@ module.exports = function (config, testPageUrl) {
 
     Module._load = function (...args) {
         const isMain                     = args[2];
-        const isNotBrowserInitMainModule = isMain &&
-            args[0] !== 'electron/js2c/browser_init' && // >= Electron v7.0.0
-            !args[0].endsWith('electron.asar' + sep + 'browser' + sep + 'init.js'); // <= Electron v6.1.5
+        const isNotBrowserInitMainModule = isMain && !isBrowserInitModule(args[0]);
 
         if (isNotBrowserInitMainModule) {
             if (config.appPath) {
