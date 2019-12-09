@@ -31,7 +31,7 @@ function startElectron (config, ports) {
         args = debugPortsArgs.concat(extraArgs);
     }
 
-    spawn(cmd, args, { stdio: 'ignore' });
+    spawn(cmd, args, { stdio: process.env.DEBUG ? 'inherit' : 'ignore' });
 }
 
 async function injectHookCode (client, code) {
