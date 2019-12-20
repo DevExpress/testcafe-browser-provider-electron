@@ -18,7 +18,7 @@ import testRunTracker from 'testcafe/lib/api/test-run-tracker';
 
 const DEBUG_LOGGER = debug('testcafe:electron');
 const STDOUT_LOGGER = DEBUG_LOGGER.extend('spawn:stdout');
-const STDERR_LOGGER = DEBUG_LOGGER.extend('spawn:stderr')
+const STDERR_LOGGER = DEBUG_LOGGER.extend('spawn:stderr');
 
 function startElectron (config, ports) {
     var cmd            = '';
@@ -38,11 +38,11 @@ function startElectron (config, ports) {
     var proc = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
 
     proc.stdout.on('data', (buf) => {
-        STDOUT_LOGGER(buf.toString().trim())
-    })
+        STDOUT_LOGGER(buf.toString().trim());
+    });
     proc.stderr.on('data', (buf) => {
-        STDERR_LOGGER(buf.toString().trim())
-    })
+        STDERR_LOGGER(buf.toString().trim());
+    });
 }
 
 async function injectHookCode (client, code) {
