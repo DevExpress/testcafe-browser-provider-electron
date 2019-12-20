@@ -38,10 +38,18 @@ function startElectron (config, ports) {
     var proc = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
 
     proc.stdout.on('data', (buf) => {
-        STDOUT_LOGGER(buf.toString().trim());
+        var str = String(buf);
+        if (str[str.length - 1] === '\n') {
+            str = str.slice(0, str.length - 1);
+        }
+        STDOUT_LOGGER(str);
     });
     proc.stderr.on('data', (buf) => {
-        STDERR_LOGGER(buf.toString().trim());
+        var str = String(buf);
+        if (str[str.length - 1] === '\n') {
+            str = str.slice(0, str.length - 1);
+        }
+        STDERR_LOGGER(str);
     });
 }
 
