@@ -4,6 +4,7 @@ import { spawn } from 'child_process';
 import Promise from 'pinkie';
 import OS from 'os-family';
 import debug from 'debug';
+import lodash from 'lodash';
 import { getFreePorts } from 'endpoint-utils';
 import NodeDebug from './node-debug';
 import NodeInspect from './node-inspect';
@@ -38,18 +39,10 @@ function startElectron (config, ports) {
     var proc = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
 
     proc.stdout.on('data', (buf) => {
-        var str = String(buf);
-        if (str[str.length - 1] === '\n') {
-            str = str.slice(0, str.length - 1);
-        }
-        STDOUT_LOGGER(str);
+        STDOUT_LOGGER(lodash.trimEnd(String(buf), '\n'));
     });
     proc.stderr.on('data', (buf) => {
-        var str = String(buf);
-        if (str[str.length - 1] === '\n') {
-            str = str.slice(0, str.length - 1);
-        }
-        STDERR_LOGGER(str);
+        STDERR_LOGGER(lodash.trimEnd(String(buf), '\n'));
     });
 }
 
