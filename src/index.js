@@ -16,7 +16,7 @@ import ERRORS from './errors';
 
 import testRunTracker from 'testcafe/lib/api/test-run-tracker';
 
-const DEBUG_LOGGER = debug('testcafe:electron');
+const DEBUG_LOGGER = debug('testcafe:browser-provider-electron');
 const STDOUT_LOGGER = DEBUG_LOGGER.extend('spawn:stdout');
 const STDERR_LOGGER = DEBUG_LOGGER.extend('spawn:stderr');
 
