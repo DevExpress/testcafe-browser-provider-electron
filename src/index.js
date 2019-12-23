@@ -38,12 +38,8 @@ function startElectron (config, ports) {
 
     var proc = spawn(cmd, args, { stdio: ['ignore', 'pipe', 'pipe'] });
 
-    proc.stdout.on('data', (buf) => {
-        STDOUT_LOGGER(lodash.trimEnd(String(buf), '\n'));
-    });
-    proc.stderr.on('data', (buf) => {
-        STDERR_LOGGER(lodash.trimEnd(String(buf), '\n'));
-    });
+    proc.stdout.on('data', buf => STDOUT_LOGGER(lodash.trimEnd(String(buf), '\n')));
+    proc.stderr.on('data', buf => STDERR_LOGGER(lodash.trimEnd(String(buf), '\n')));
 }
 
 async function injectHookCode (client, code) {
