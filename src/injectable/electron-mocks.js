@@ -54,8 +54,7 @@ function handleDialog (type, args) {
 module.exports = function install (config, testPageUrl) {
     ipc = new Client(config, { dialogHandler, contextMenuHandler, windowHandler });
 
-    ipc.connect();
-
+    const ipcConnectionPromise = ipc.connect();
     var { Menu, dialog, app } = require('electron');
 
     var WebContents;
@@ -82,9 +81,9 @@ module.exports = function install (config, testPageUrl) {
         return url.indexOf('file:') === 0;
     }
 
-    WebContents.prototype.loadURL = function (url, options) {
+    WebContents.prototype.loadURL = async function (url, options) {
         startLoadingTimeout(config.mainWindowUrl);
-
+        await ipcConnectionPromise;
         let testUrl = stripQuery(url);
 
         if (isFileProtocol(url))
