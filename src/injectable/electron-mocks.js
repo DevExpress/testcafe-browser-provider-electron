@@ -114,7 +114,7 @@ module.exports = function install (config, testPageUrl) {
 
     WebContents.prototype.loadURL = function (url, options) {
         startLoadingTimeout(config.mainWindowUrl);
-        
+
         if (ELECTRON_VERSION >= ELECTRON_VERSION_WITH_ASYNC_LOAD_URL)
             return ipcConnectionPromise.then(() => loadUrl(this, url, options));
 
