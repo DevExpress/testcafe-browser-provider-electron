@@ -15,7 +15,7 @@ npm install testcafe-browser-provider-electron
 
 If your JavaScript application runs in Electron, follow these steps to set up testing.
 
-1. Create a JSON `.testcafe-electron-rc` or JavaScript `.testcafe-electron-rc.js` [configuration file](#configuration) in the root application directory. Include the following settings to this file.
+1. Create a JSON `.testcafe-electron-rc.json` or JavaScript `.testcafe-electron-rc.js` [configuration file](#configuration) in the root application directory. Include the following settings to this file.
 
     *JSON*
 
