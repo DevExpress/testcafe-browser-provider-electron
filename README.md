@@ -119,7 +119,7 @@ fixture `Electron test`
 
 ## Configuration
 
-You can specify browser provider options in a JSON `.testcafe-electron-rc` or JavaScript `.testcafe-electron-rc.js` configuration file.
+You can specify browser provider options in a JSON `.testcafe-electron-rc.json` or JavaScript `.testcafe-electron-rc.js` configuration file.
 
 *JSON*
 
