@@ -9,13 +9,13 @@ const ELECTRON_VERSION_WITH_ASYNC_LOAD_URL = 5;
 const URL_QUERY_RE      = /\?.*$/;
 const NAVIGATION_EVENTS = ['will-navigate', 'did-navigate'];
 
-var ipc                = null;
-var loadingTimeout     = null;
-var openedUrls         = [];
-var contextMenuHandler = { menu: null };
-var windowHandler      = { window: null };
+let ipc                  = null;
+let loadingTimeout       = null;
+const openedUrls         = [];
+const contextMenuHandler = { menu: null };
+const windowHandler      = { window: null };
 
-var dialogHandler = {
+const dialogHandler = {
     fn:                   null,
     handledDialog:        false,
     hadUnexpectedDialogs: false,
@@ -45,9 +45,9 @@ function handleDialog (type, args) {
 
     dialogHandler.handledDialog = true;
 
-    var handlerFunction = dialogHandler.fn;
-    var handlerResult   = handlerFunction(type, ...args);
-    var lastArg         = args.length ? args[args.length - 1] : null;
+    const handlerFunction = dialogHandler.fn;
+    const handlerResult   = handlerFunction(type, ...args);
+    const lastArg         = args.length ? args[args.length - 1] : null;
 
     if (typeof lastArg === 'function')
         lastArg(handlerResult);
@@ -55,28 +55,28 @@ function handleDialog (type, args) {
     return handlerResult;
 }
 
+function getWebContents () {
+    // NOTE: < Electron 6
+    if (process.atomBinding)
+        return process.atomBinding('web_contents').WebContents;
+    // NOTE: >= Electron 6
+    else if (process.electronBinding)
+        return process.electronBinding('web_contents').WebContents;
+
+    // NOTE: Electron 11
+    return process._linkedBinding('electron_browser_web_contents').WebContents;
+}
+
 module.exports = function install (config, testPageUrl) {
     ipc = new Client(config, { dialogHandler, contextMenuHandler, windowHandler });
 
     const ipcConnectionPromise = ipc.connect();
-    
-    var { Menu, dialog, app } = require('electron');
 
-    var WebContents;
+    const { Menu, dialog, app } = require('electron');
 
-    if ( process.atomBinding ) {
-        // NOTE: < Electron 6
-        WebContents = process.atomBinding('web_contents').WebContents;
-    }
-    else {
-        // NOTE: >= Electron 6
-        WebContents = process.electronBinding('web_contents').WebContents;
-    }
-
-
-    var origLoadURL = WebContents.prototype.loadURL;
-
-    var origGetAppPath = app.getAppPath;
+    const WebContents    = getWebContents();
+    let origLoadURL      = WebContents.prototype.loadURL;
+    const origGetAppPath = app.getAppPath;
 
     function stripQuery (url) {
         return url.replace(URL_QUERY_RE, '');
@@ -112,14 +112,29 @@ module.exports = function install (config, testPageUrl) {
         return origLoadURL.call(webContext, url, options);
     }
 
-    WebContents.prototype.loadURL = function (url, options) {
+    function loadURLWrapper (url, options) {
         startLoadingTimeout(config.mainWindowUrl);
 
         if (ELECTRON_VERSION >= ELECTRON_VERSION_WITH_ASYNC_LOAD_URL)
             return ipcConnectionPromise.then(() => loadUrl(this, url, options));
 
         return loadUrl(this, url, options);
-    };
+    }
+
+    // NOTE: Electron 11 has no loadURL method in the WebContents prototype,
+    // so we update it in the WebContents.prototype._init method due to the Electron 11 logic. (GH-73)
+    if (WebContents.prototype._init) {
+        const savedWebContentsInit = WebContents.prototype._init;
+
+        WebContents.prototype._init = function () {
+            savedWebContentsInit.call(this);
+
+            origLoadURL  = this.loadURL;
+            this.loadURL = loadURLWrapper;
+        };
+    }
+    else
+        WebContents.prototype.loadURL = loadURLWrapper;
 
     app.getAppPath = function () {
         return config.appPath || origGetAppPath.call(this);
@@ -134,7 +149,7 @@ module.exports = function install (config, testPageUrl) {
     };
 
     if (!config.enableNavigateEvents) {
-        var origOn = WebContents.prototype.on;
+        const origOn = WebContents.prototype.on;
 
         WebContents.prototype.on = function (event, listener) {
             if (NAVIGATION_EVENTS.indexOf(event) > -1)
