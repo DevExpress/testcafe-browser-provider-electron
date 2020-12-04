@@ -121,8 +121,10 @@ module.exports = function install (config, testPageUrl) {
         return loadUrl(this, url, options);
     }
 
-    // NOTE: Electron 11 has no loadURL method in the WebContents prototype,
-    // so we update it in the WebContents.prototype._init method due to the Electron 11 logic. (GH-73)
+    // NOTE: Electron 11 has no loadURL method in the WebContents prototype.
+    // We imitate the native behavior (https://github.com/electron/electron/pull/24325/files#diff-f6ca6a11b1d9a20b2f71e91a51c06f4956adb0eec9f07ac0705190f77c257211R437,
+    // https://github.com/electron/electron/blob/v11.0.3/lib/browser/api/web-contents.ts#L472)
+    // and rewrite it as soon it became available. (GH-73)
     if (WebContents.prototype._init) {
         const savedWebContentsInit = WebContents.prototype._init;
 
