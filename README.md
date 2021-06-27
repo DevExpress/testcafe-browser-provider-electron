@@ -359,7 +359,8 @@ fixture `Test Electron`
    .page('./index.html');
 
 test('Should open search panel', async t => {
-   await clickOnMainMenuItem(['Main Menu', 'Edit', 'Find...']);
+   const findMenuItem = await getMainMenuItem(['Main Menu', 'Edit', 'Find...']);
+   await clickOnMainMenuItem(findMenuItem);
 
    await searchPanel = Selector('.search-panel');
 
