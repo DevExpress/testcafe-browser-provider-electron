@@ -20,7 +20,11 @@ function createWindow () {
             // NOTE: Electron 10 breaking changes:
             // "Changed the default value of `enableRemoteModule` to `false`"
             // (https://www.electronjs.org/blog/electron-10-0#breaking-changes) (GH-73)
-            enableRemoteModule: true
+            enableRemoteModule: true,
+            // NOTE: Electron 12 breaking changes:
+            // "Changed the default value of `contextIsolation` to `true`"
+            // (https://www.electronjs.org/blog/electron-12-0#breaking-changes)
+            contextIsolation:   false,
         }
     });
 
