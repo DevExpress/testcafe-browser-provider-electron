@@ -1,4 +1,5 @@
 {
   "mainWindowUrl": "../test-app-regular/index.html",
-  "appPath": "../test-app-regular"
+  "appPath": "../test-app-regular",
+  "enableDebug": false
 }

@@ -24,7 +24,12 @@ const STDERR_LOGGER = DEBUG_LOGGER.extend('spawn:stderr');
 function startElectron (config, ports) {
     var cmd            = '';
     var args           = null;
-    var debugPortsArgs = [`--debug-brk=${ports[0]}`, `--inspect-brk=${ports[1]}`];
+
+    var debugPortsArgs = [`--inspect-brk=${ports[1]}`];
+
+    if (config.enableDebug)
+        debugPortsArgs.unshift(`--debug-brk=${ports[0]}`);
+
     var extraArgs      = config.appArgs || [];
 
     if (OS.mac && statSync(config.electronPath).isDirectory()) {
@@ -81,11 +86,12 @@ const ElectronBrowserProvider = {
         var hookCode      = getHookCode(config, pageUrl);
         var debugClient   = new NodeDebug(ports[0]);
         var inspectClient = new NodeInspect(ports[1]);
+        var clients = [inspectClient];
 
-        await Promise.race([
-            injectHookCode(debugClient, hookCode),
-            injectHookCode(inspectClient, hookCode)
-        ]);
+        if (config.enableDebug)
+            clients.unshift(debugClient);
+
+        await Promise.race(clients.map(client => injectHookCode(client, hookCode)));
 
         await ipcServer.connect();
 

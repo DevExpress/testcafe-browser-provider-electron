@@ -1,4 +1,5 @@
 {
   "mainWindowUrl": "../test-app.asar/index.html",
-  "appPath": "../test-app.asar"
+  "appPath": "../test-app.asar",
+  "enableDebug": false
 }
