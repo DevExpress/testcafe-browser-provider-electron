@@ -175,10 +175,6 @@ __Optional.__ `testcafe-browser-provider-electron` suppresses `did-navigate` and
 
 __Optional.__ If `true`, DevTools will be opened just before tests start.
 
-### enableDebug
-
-__Optional.__ If `true`, the parameter `--debug-brk=<port>` will be used when connecting to [Electron < 1.74](https://www.electronjs.org/releases/stable?version=1&page=5#1.7.4).
-
 ## Helpers
 
 You can use helper functions from the provider in your test files. Use ES6 import statement to access them.

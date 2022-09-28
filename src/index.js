@@ -1,12 +1,10 @@
 import path from 'path';
 import { statSync } from 'fs';
 import { spawn } from 'child_process';
-import Promise from 'pinkie';
 import OS from 'os-family';
 import debug from 'debug';
 import lodash from 'lodash';
 import { getFreePorts } from 'endpoint-utils';
-import NodeDebug from './node-debug';
 import NodeInspect from './node-inspect';
 import isAbsolute from './utils/is-absolute';
 import getConfig from './utils/get-config';
@@ -24,12 +22,7 @@ const STDERR_LOGGER = DEBUG_LOGGER.extend('spawn:stderr');
 function startElectron (config, ports) {
     var cmd            = '';
     var args           = null;
-
     var debugPortsArgs = [`--inspect-brk=${ports[1]}`];
-
-    if (config.enableDebug)
-        debugPortsArgs.unshift(`--debug-brk=${ports[0]}`);
-
     var extraArgs      = config.appArgs || [];
 
     if (OS.mac && statSync(config.electronPath).isDirectory()) {
@@ -84,15 +77,9 @@ const ElectronBrowserProvider = {
         startElectron(config, ports);
 
         var hookCode      = getHookCode(config, pageUrl);
-        var debugClient   = new NodeDebug(ports[0]);
         var inspectClient = new NodeInspect(ports[1]);
-        var clients = [inspectClient];
 
-        if (config.enableDebug)
-            clients.unshift(debugClient);
-
-        await Promise.race(clients.map(client => injectHookCode(client, hookCode)));
-
+        await injectHookCode(inspectClient, hookCode);
         await ipcServer.connect();
 
         var injectingStatus = await ipcServer.getInjectingStatus();
