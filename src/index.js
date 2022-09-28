@@ -80,7 +80,6 @@ const ElectronBrowserProvider = {
         var inspectClient = new NodeInspect(ports[1]);
 
         await injectHookCode(inspectClient, hookCode);
-
         await ipcServer.connect();
 
         var injectingStatus = await ipcServer.getInjectingStatus();
