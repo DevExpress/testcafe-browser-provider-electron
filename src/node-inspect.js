@@ -42,7 +42,7 @@ export default class NodeInspect {
 
         await this.client.Runtime.runIfWaitingForDebugger();
 
-        var { callFrames } = await pausedEvent;
+        var [{ callFrames }] = await pausedEvent;
 
         this.callFrameId = callFrames[0].callFrameId;
     }
