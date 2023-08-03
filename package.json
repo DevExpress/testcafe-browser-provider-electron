@@ -57,7 +57,7 @@
     "electron": "^21.2.0",
     "gulp": "^4.0.0",
     "gulp-babel": "^7.0.0",
-    "gulp-eslint": "^3.0.1",
+    "gulp-eslint": "^6.0.0",
     "publish-please": "^5.4.3",
     "testcafe": "*",
     "tmp": "0.0.28"
