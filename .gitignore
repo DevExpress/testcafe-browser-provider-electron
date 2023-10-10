@@ -3,3 +3,4 @@
 lib
 node_modules
 /test/data/test-app.asar
+.builds/
