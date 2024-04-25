@@ -18,8 +18,10 @@ module.exports = function (config, testPageUrl) {
     Module._load = function (...args) {
         const isMain                     = args[2];
         const isNotBrowserInitMainModule = isMain && !isBrowserInitModule(args[0]);
+        const isNotBrowserInitMainModuleAsOfElectron25 = args[0] === 'electron' && !args[1];
+        const runDecorator = isNotBrowserInitMainModule || isNotBrowserInitMainModuleAsOfElectron25
 
-        if (isNotBrowserInitMainModule) {
+        if (runDecorator) {
             if (config.appPath) {
                 config.appEntryPoint = require.resolve(config.appPath);
 
