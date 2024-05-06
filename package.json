@@ -33,7 +33,7 @@
     "debug": "4.3.1",
     "dedent": "^0.7.0",
     "endpoint-utils": "^1.0.2",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.21",
     "mustache": "^2.3.0",
     "node-ipc": "9.2.1",
     "os-family": "^1.0.0",
@@ -62,5 +62,8 @@
     "testcafe": "*",
     "tmp": "0.0.28"
   },
-  "types": "./ts-defs/index.d.ts"
+  "types": "./ts-defs/index.d.ts",
+  "overrides": {
+    "lodash": "^4.17.21"
+  }
 }
