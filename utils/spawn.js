@@ -1,4 +1,4 @@
-var nodeSpawn = require('cross-spawn')
+var nodeSpawn = require('cross-spawn');
 var Promise   = require('pinkie');
 var assign    = require('lodash').assign;
 
