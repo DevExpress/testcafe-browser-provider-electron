@@ -4,7 +4,7 @@ import { spawn } from 'child_process';
 import OS from 'os-family';
 import debug from 'debug';
 import lodash from 'lodash';
-import { getFreePorts } from 'endpoint-utils';
+import { getFreePorts } from '../utils/endpoint-utils';
 import NodeInspect from './node-inspect';
 import isAbsolute from './utils/is-absolute';
 import getConfig from './utils/get-config';
