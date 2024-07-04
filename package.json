@@ -42,7 +42,7 @@
     "proxyquire": "^1.7.10"
   },
   "peerDependencies": {
-    "testcafe": "^3.6.0"
+    "testcafe": "latest"
   },
   "devDependencies": {
     "@babel/core": "^7.24.1",
@@ -59,7 +59,7 @@
     "gulp-babel": "^8.0.0",
     "gulp-eslint": "^6.0.0",
     "publish-please": "^5.4.3",
-    "testcafe": "^3.6.0",
+    "testcafe": "latest",
     "tmp": "0.0.28"
   },
   "types": "./ts-defs/index.d.ts",
