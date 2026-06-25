@@ -54,7 +54,7 @@
     "asar": "^2.0.1",
     "babel-plugin-add-module-exports": "^0.2.1",
     "del": "^2.0.0",
-    "electron": "^22.3.21",
+    "electron": "^38.0.0",
     "eslint": "^8.0.0",
     "gulp": "^4.0.0",
     "gulp-babel": "^8.0.0",
